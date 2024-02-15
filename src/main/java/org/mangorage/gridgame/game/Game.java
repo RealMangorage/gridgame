@@ -1,7 +1,6 @@
 package org.mangorage.gridgame.game;
 
 import org.mangorage.gridgame.api.grid.Grid;
-import org.mangorage.gridgame.api.IRender;
 import org.mangorage.gridgame.registry.TileRenderers;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.render.RenderableScreen;
@@ -12,7 +11,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-public class Game extends Thread implements IRender, KeyListener, MouseWheelListener {
+public class Game extends Thread implements KeyListener, MouseWheelListener {
     public static void init() {
         Tiles.init();
         TileRenderers.init();
@@ -82,8 +81,7 @@ public class Game extends Thread implements IRender, KeyListener, MouseWheelList
     }
 
 
-    @Override
-    public void render(Graphics graphics, int x, int y) {
+    public void render(Graphics graphics) {
         grid.render(graphics);
         Grid layer = grid.getNextLayer();
         while (layer != null) {

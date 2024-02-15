@@ -1,14 +1,13 @@
 package org.mangorage.gridgame.api.grid;
 
-import org.mangorage.gridgame.api.IRender;
-import org.mangorage.gridgame.api.render.RenderManager;
+import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Tiles;
 
 import java.awt.*;
 import java.lang.reflect.Array;
 
-public class Grid implements IRender {
+public class Grid {
     private final GridTile[][] tiles;
     private final int sizeX, sizeY;
 
@@ -90,9 +89,8 @@ public class Grid implements IRender {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void render(Graphics graphics, int pX, int pY) {
+    public void render(Graphics graphics) {
         var plr = Game.getInstance().getPlayer();
         var scale = Game.getInstance().getScale();
 
