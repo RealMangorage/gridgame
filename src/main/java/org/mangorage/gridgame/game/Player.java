@@ -36,7 +36,7 @@ public class Player {
         int newY = y + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY < grid.getSizeY()) {
-            ITile walkTo = grid.getTile(x, newY);
+            ITile walkTo = grid.getGridTile(x, newY).getTile();
             if (!walkTo.isSolid(x, newY)) {
                 removeTile(Game.getInstance().getGrid(1));
                 this.y = newY;
@@ -49,7 +49,7 @@ public class Player {
         int newY = y - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY != -1) {
-            ITile walkTo = grid.getTile(x, newY);
+            ITile walkTo = grid.getGridTile(x, newY).getTile();
             if (!walkTo.isSolid(x, newY)) {
                 removeTile(Game.getInstance().getGrid(1));
                 this.y = newY;
@@ -62,7 +62,7 @@ public class Player {
         int newX = x - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX != -1) {
-            ITile walkTo = grid.getTile(newX, y);
+            ITile walkTo = grid.getGridTile(newX, y).getTile();
             if (!walkTo.isSolid(newX, y)) {
                 removeTile(Game.getInstance().getGrid(1));
                 this.x = newX;
@@ -75,7 +75,7 @@ public class Player {
         int newX = x + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX < grid.getSizeX()) {
-            ITile walkTo = grid.getTile(newX, y);
+            ITile walkTo = grid.getGridTile(newX, y).getTile();
             if (!walkTo.isSolid(newX, y)) {
                 removeTile(Game.getInstance().getGrid(1));
                 this.x = newX;

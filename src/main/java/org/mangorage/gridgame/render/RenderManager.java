@@ -3,7 +3,6 @@ package org.mangorage.gridgame.render;
 import org.mangorage.gridgame.api.grid.ITile;
 import org.mangorage.gridgame.api.grid.ITileEntity;
 import org.mangorage.gridgame.api.render.IRenderer;
-import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +23,13 @@ public final class RenderManager {
         rendererMap.put(tile, renderer);
     }
 
-    public <T extends ITile> void register(T tile, IRenderer<T, TileEntity> renderer) {
-        rendererMap.put(tile, renderer);
+    public <T extends ITile> void register(T tile, IRenderer<T, ITileEntity> renderer) {
+        register(tile, null, renderer);
     }
 
-    public IRenderer getRenderer(ITile tile) {
-        return rendererMap.get(tile);
+    @SuppressWarnings("unchecked")
+    public IRenderer<ITile, ITileEntity> getRenderer(ITile tile) {
+        return (IRenderer<ITile, ITileEntity>) rendererMap.get(tile);
     }
 
 }

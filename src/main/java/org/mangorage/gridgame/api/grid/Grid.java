@@ -5,10 +5,16 @@ import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Tiles;
 
 import java.awt.*;
-import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Grid {
+    // for Querying a specific x/y coordinate
     private final GridTile[][] tiles;
+
+    // for general looping, if you want to go through all the tiles and tick them
+    private final List<GridTile> tilesList;
     private final int sizeX, sizeY;
 
     private int boundsX, boundsY;
@@ -19,8 +25,15 @@ public class Grid {
         this.sizeY = y;
         this.boundsX = boundsX;
         this.boundsY = boundsY;
-        this.tiles = (GridTile[][]) Array.newInstance(GridTile.class, x, y);
+        this.tiles = new GridTile[x][y];
         populate(border);
+
+        List<GridTile> tileList = new ArrayList<>();
+        for (GridTile[] tile : tiles) {
+            tileList.addAll(Arrays.asList(tile));
+        }
+
+        this.tilesList = List.copyOf(tileList);
     }
 
     public Grid(int x, int y, int bX, int bY) {
@@ -28,13 +41,11 @@ public class Grid {
     }
 
     public void tick() {
-        for (int x = 0; x < this.sizeX; x++) {
-            for (int y = 0; y < this.sizeY; y++) {
-                var tileEntity = getGridTile(x, y).getTileEntity();
-                if (tileEntity != null)
-                    tileEntity.tick();
-            }
-        }
+        tilesList.forEach(gridTile -> {
+            var tileEntity = gridTile.getTileEntity();
+            if (tileEntity != null)
+                tileEntity.tick();
+        });
 
         if (getNextLayer() != null) getNextLayer().tick();
     }
@@ -68,10 +79,6 @@ public class Grid {
         return tiles[x][y];
     }
 
-    public ITile getTile(int x, int y) {
-        return getGridTile(x, y).getTile();
-    }
-
     public void setTile(int x, int y, ITile tile) {
         if (tiles[x][y] == null) tiles[x][y] = new GridTile(x, y);
         tiles[x][y].setTile(tile);
@@ -89,7 +96,6 @@ public class Grid {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void render(Graphics graphics) {
         var plr = Game.getInstance().getPlayer();
         var scale = Game.getInstance().getScale();
