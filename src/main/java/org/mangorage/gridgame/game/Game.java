@@ -39,7 +39,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
     private final Grid entityGrid = grid.createNewLayer();
 
     private final Player player = new Player();
-    private int scale = 64;
+    private int scale = 40;
     private boolean running = true;
     private int tickRate = 20;
     private int ticks = 0;
@@ -94,11 +94,6 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
 
     public void render(Graphics graphics) {
         grid.render(graphics);
-        Grid layer = grid.getNextLayer();
-        while (layer != null) {
-            layer.render(graphics);
-            layer = layer.getNextLayer();
-        }
     }
 
     @Override
@@ -119,6 +114,10 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
             }
             case KeyEvent.VK_F1 -> save();
             case KeyEvent.VK_F4 -> SoundAPI.playSound("/assets/toilet_flush.wav");
+            case KeyEvent.VK_UP -> grid.updateBounds(grid.getBoundsX(), grid.getBoundsY() - 1);
+            case KeyEvent.VK_DOWN -> grid.updateBounds(grid.getBoundsX(), grid.getBoundsY() + 1);
+            case KeyEvent.VK_G -> grid.updateBounds(grid.getBoundsX() - 1, grid.getBoundsY());
+            case KeyEvent.VK_H -> grid.updateBounds(grid.getBoundsX() + 1, grid.getBoundsY());
         }
     }
 
@@ -201,10 +200,8 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         var val = e.getWheelRotation();
         if (val > 0 && scale > 16) {
             scale = scale - 2;
-            grid.updateBounds(scale);
         } else if (val < 0 && scale < 40) {
             scale = scale + 2;
-            grid.updateBounds(scale);
         }
     }
 }

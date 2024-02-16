@@ -33,9 +33,8 @@ public class Grid {
         populate(border);
 
         List<GridTile> tileList = new ArrayList<>();
-        for (GridTile[] tile : tiles) {
+        for (GridTile[] tile : tiles)
             tileList.addAll(Arrays.asList(tile));
-        }
 
         this.tilesList = List.copyOf(tileList);
     }
@@ -60,10 +59,12 @@ public class Grid {
         return nextLayer;
     }
 
-    public void updateBounds(int scale) {
-        //this.boundsX = Math.min(sizeX, scale ^ 2);
-        //this.boundsY = Math.min(sizeY, scale ^ 2);
-        if (getNextLayer() != null) getNextLayer().updateBounds(scale);
+    public void updateBounds(int x, int y) {
+        if (x > 5)
+            this.boundsX = Math.min(x, sizeX);
+        if (y > 5)
+            this.boundsY = Math.min(sizeY, y);
+        if (getNextLayer() != null) getNextLayer().updateBounds(x, y);
     }
 
     public Grid getNextLayer() {
@@ -76,6 +77,14 @@ public class Grid {
 
     public int getSizeY() {
         return sizeY;
+    }
+
+    public int getBoundsX() {
+        return boundsX;
+    }
+
+    public int getBoundsY() {
+        return boundsY;
     }
 
     public GridTile getGridTile(int x, int y) {
@@ -114,8 +123,8 @@ public class Grid {
         if (plrY > boundsY)
             oY = plrY - boundsY;
 
-        for (int x = oX; x < Math.min(oX + boundsX + 2, sizeX); x++) {
-            for (int y = oY; y < Math.min(oY + boundsY + 2, sizeY); y++) {
+        for (int x = oX; x < Math.min(oX + boundsX + 3, sizeX); x++) {
+            for (int y = oY; y < Math.min(oY + boundsY + 3, sizeY); y++) {
                 var GridTile = getGridTile(x, y);
                 var tile = GridTile.getTile();
                 var tileEntity = GridTile.getTileEntity();
@@ -136,6 +145,9 @@ public class Grid {
                 );
             }
         }
+
+        if (getNextLayer() != null)
+            getNextLayer().render(graphics);
     }
 
     public void save(CompoundTag tag) {
