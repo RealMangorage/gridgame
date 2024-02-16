@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     id 'java'
 }
@@ -7,13 +9,40 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url = 'https://jitpack.io/'
+    }
 }
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation 'com.github.Querz:NBT:6.1'
 }
 
 test {
     useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class' : 'org.mangorage.gridgame.Start'
+        )
+    }
+}
+
+task runGame(type: JavaExec) {
+    // Set the main class to run
+    main = 'org.mangorage.gridgame.Start'
+    classpath = sourceSets.main.runtimeClasspath
+
+    setWorkingDir("build/run")
+    setGroup("runs")
+
+    doFirst {
+        File runDir = file("build/run")
+        runDir.mkdirs()
+    }
 }

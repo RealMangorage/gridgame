@@ -8,4 +8,9 @@ public class EmptyTile implements ITile {
     public boolean isSolid(int x, int y) {
         return false;
     }
+
+    @Override
+    public boolean canSave() {
+        return false;
+    }
 }

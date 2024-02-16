@@ -1,6 +1,10 @@
 package org.mangorage.gridgame.game;
 
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.mangorage.gridgame.api.grid.Grid;
+import org.mangorage.gridgame.registry.TileRegistry;
 import org.mangorage.gridgame.registry.TileRenderers;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.render.RenderableScreen;
@@ -10,13 +14,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class Game extends Thread implements KeyListener, MouseWheelListener {
     public static void init() {
+        TileRegistry.getInstance().createTileLookup();
         Tiles.init();
         TileRenderers.init();
+        GAME.load();
         GAME.start();
     }
+
 
     private static final Game GAME = new Game();
 
@@ -103,6 +113,65 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
             case KeyEvent.VK_A -> player.moveLeft();
             case KeyEvent.VK_D -> player.moveRight();
             case KeyEvent.VK_SPACE -> grid.setTile(player.getX(), player.getY(), Tiles.UN_SOLID_TILE);
+            case KeyEvent.VK_F1 -> save();
+        }
+    }
+
+    private void save() {
+        File gameData = new File("gamedata.nbt");
+        if (Files.exists(gameData.toPath()))
+            if (!gameData.delete())
+                System.out.println("Error while attempting to delete previous save data...");
+
+
+        CompoundTag gameDataTag = new CompoundTag();
+        ListTag<CompoundTag> layerTags = new ListTag<>(CompoundTag.class);
+        CompoundTag tag = new CompoundTag();
+        Grid grid = getGrid();
+
+        while (grid != null) {
+            grid.save(tag);
+
+            layerTags.add(tag);
+            grid = grid.getNextLayer();
+            tag = new CompoundTag();
+        }
+
+        gameDataTag.put("layers", layerTags);
+
+        ListTag<CompoundTag> tags = new ListTag<>(CompoundTag.class);
+        TileRegistry.getInstance().getTileLookup().forEach((k, v) -> {
+            CompoundTag compoundTag = new CompoundTag();
+            compoundTag.putString("id", k);
+            compoundTag.putShort("idShort", v);
+            tags.add(compoundTag);
+        });
+        gameDataTag.put("lookup", tags);
+
+        try {
+            NBTUtil.write(gameDataTag, gameData, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void load() {
+        File gameData = new File("gamedata.nbt");
+        if (Files.exists(gameData.toPath())) {
+            try {
+                CompoundTag gameDataTag = (CompoundTag) NBTUtil.read(gameData, true).getTag();
+                var lookup = TileRegistry.getTileLookupFromTag(gameDataTag.getListTag("lookup").asCompoundTagList());
+                ListTag<CompoundTag> layers = gameDataTag.getListTag("layers").asCompoundTagList();
+                Grid grid = getGrid();
+                for (CompoundTag layer : layers) {
+                    grid.load(layer, lookup);
+                    if (grid.getNextLayer() != null) {
+                        grid = grid.getNextLayer();
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

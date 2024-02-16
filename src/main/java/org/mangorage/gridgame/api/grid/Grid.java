@@ -1,5 +1,8 @@
 package org.mangorage.gridgame.api.grid;
 
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
+import org.mangorage.gridgame.registry.TileRegistry;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Tiles;
@@ -8,6 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Grid {
     // for Querying a specific x/y coordinate
@@ -132,5 +136,50 @@ public class Grid {
                 );
             }
         }
+    }
+
+    public void save(CompoundTag tag) {
+        ListTag<CompoundTag> tilesTags = new ListTag<>(CompoundTag.class);
+        var map = TileRegistry.getInstance().getTileLookup();
+
+        tilesList.forEach(gridTile -> {
+            if (gridTile.getTile().canSave()) {
+                CompoundTag tileTag = new CompoundTag();
+                String id = TileRegistry.getInstance().getID(gridTile.getTile());
+                int x = gridTile.getX();
+                int y = gridTile.getY();
+
+                tileTag.putShort("id", map.get(id));
+                tileTag.putInt("x", x);
+                tileTag.putInt("y", y);
+
+                // TODO: Tack on TileData
+                var TE = gridTile.getTileEntity();
+                if (TE != null) {
+                    CompoundTag tileDataTag = new CompoundTag();
+                    TE.save(tileDataTag);
+                    tileTag.put("tileData", tileDataTag);
+                }
+
+                tilesTags.add(tileTag);
+            }
+        });
+        tag.put("tiles", tilesTags);
+    }
+
+    public void load(CompoundTag tag, Map<Short, String> tileLookup) {
+        ListTag<CompoundTag> tilesTags = tag.getListTag("tiles").asCompoundTagList();
+
+        tilesTags.forEach(tile -> {
+            String id = tileLookup.get(tile.getShort("id"));
+            var x = tile.getInt("x");
+            var y = tile.getInt("y");
+
+            getGridTile(x, y).setTile(TileRegistry.getInstance().getTile(id));
+            var TE = getGridTile(x, y).getTileEntity();
+            if (TE != null && tile.containsKey("tileData")) {
+                TE.load(tile.getCompoundTag("tileData"));
+            }
+        });
     }
 }

@@ -17,6 +17,14 @@ public final class GridTile {
             this.entity = entityTile.createTileEntity(x, y);
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     public ITile getTile() {
         return tile;
     }

@@ -2,7 +2,7 @@ package org.mangorage.gridgame.registry;
 
 import org.mangorage.gridgame.api.CacheAPI;
 import org.mangorage.gridgame.render.RenderManager;
-import org.mangorage.gridgame.game.tiles.entities.UnsolidWallTileEntity;
+import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 
 import java.awt.*;
 
@@ -25,7 +25,7 @@ public class TileRenderers {
         );
         manager.register(
                 Tiles.UN_SOLID_TILE,
-                UnsolidWallTileEntity.class,
+                UnSolidWallTileEntity.class,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     var texture = tileEntity.isSolid() ? CacheAPI.getInternalImage("/assets/stone.png") : CacheAPI.getInternalImage("/assets/cobblestone.png");
                     graphics.drawImage(texture, (x - offsetX) * width, (y - offsetY) * height, width, height, null);
