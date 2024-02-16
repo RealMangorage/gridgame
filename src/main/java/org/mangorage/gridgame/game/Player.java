@@ -1,7 +1,5 @@
 package org.mangorage.gridgame.game;
 
-
-import org.mangorage.gridgame.api.SoundAPI;
 import org.mangorage.gridgame.api.grid.Grid;
 import org.mangorage.gridgame.api.grid.ITile;
 import org.mangorage.gridgame.registry.Tiles;
@@ -15,6 +13,14 @@ public class Player {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public void updatePosition(Grid grid, int newX, int newY) {
+        grid.setTile(x, y, Tiles.EMPTY_TILE);
+        grid.setTile(newX, newY, Tiles.PLAYER_TILE);
+
+        this.x = newX;
+        this.y = newY;
     }
 
     public int getX() {
@@ -39,9 +45,7 @@ public class Player {
         if (newY < grid.getSizeY()) {
             ITile walkTo = grid.getGridTile(x, newY).getTile();
             if (!walkTo.isSolid(x, newY)) {
-                removeTile(Game.getInstance().getGrid(1));
-                this.y = newY;
-                setTile(Game.getInstance().getGrid(1));
+                updatePosition(Game.getInstance().getGrid(1), x, newY);
             }
         }
     }
@@ -52,9 +56,7 @@ public class Player {
         if (newY != -1) {
             ITile walkTo = grid.getGridTile(x, newY).getTile();
             if (!walkTo.isSolid(x, newY)) {
-                removeTile(Game.getInstance().getGrid(1));
-                this.y = newY;
-                setTile(Game.getInstance().getGrid(1));
+                updatePosition(Game.getInstance().getGrid(1), x, newY);
             }
         }
     }
@@ -65,9 +67,7 @@ public class Player {
         if (newX != -1) {
             ITile walkTo = grid.getGridTile(newX, y).getTile();
             if (!walkTo.isSolid(newX, y)) {
-                removeTile(Game.getInstance().getGrid(1));
-                this.x = newX;
-                setTile(Game.getInstance().getGrid(1));
+                updatePosition(Game.getInstance().getGrid(1), newX, y);
             }
         }
     }
@@ -78,9 +78,7 @@ public class Player {
         if (newX < grid.getSizeX()) {
             ITile walkTo = grid.getGridTile(newX, y).getTile();
             if (!walkTo.isSolid(newX, y)) {
-                removeTile(Game.getInstance().getGrid(1));
-                this.x = newX;
-                setTile(Game.getInstance().getGrid(1));
+                updatePosition(Game.getInstance().getGrid(1), newX, y);
             }
         }
     }

@@ -142,8 +142,6 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
             tag = new CompoundTag();
         }
 
-        gameDataTag.put("layers", layerTags);
-
         ListTag<CompoundTag> tags = new ListTag<>(CompoundTag.class);
         TileRegistry.getInstance().getTileLookup().forEach((k, v) -> {
             CompoundTag compoundTag = new CompoundTag();
@@ -151,7 +149,15 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
             compoundTag.putShort("idShort", v);
             tags.add(compoundTag);
         });
+
+        CompoundTag playerDataTag = new CompoundTag();
+        playerDataTag.putInt("x", player.getX());
+        playerDataTag.putInt("y", player.getY());
+
+
+        gameDataTag.put("layers", layerTags);
         gameDataTag.put("lookup", tags);
+        gameDataTag.put("playerData", playerDataTag);
 
         try {
             NBTUtil.write(gameDataTag, gameData, true);
@@ -174,6 +180,11 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
                         grid = grid.getNextLayer();
                     }
                 }
+
+                CompoundTag playerData = gameDataTag.getCompoundTag("playerData");
+                int x = playerData.getInt("x");
+                int y = playerData.getInt("y");
+                player.updatePosition(entityGrid, x, y);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
