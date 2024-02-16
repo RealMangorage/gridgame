@@ -3,6 +3,7 @@ package org.mangorage.gridgame.game;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
+import org.mangorage.gridgame.api.SoundAPI;
 import org.mangorage.gridgame.api.grid.Grid;
 import org.mangorage.gridgame.registry.TileRegistry;
 import org.mangorage.gridgame.registry.TileRenderers;
@@ -112,8 +113,12 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
             case KeyEvent.VK_W -> player.moveUp();
             case KeyEvent.VK_A -> player.moveLeft();
             case KeyEvent.VK_D -> player.moveRight();
-            case KeyEvent.VK_SPACE -> grid.setTile(player.getX(), player.getY(), Tiles.UN_SOLID_TILE);
+            case KeyEvent.VK_SPACE -> {
+                SoundAPI.playSound("/assets/quick.wav");
+                grid.setTile(player.getX(), player.getY(), Tiles.UN_SOLID_TILE);
+            }
             case KeyEvent.VK_F1 -> save();
+            case KeyEvent.VK_F4 -> SoundAPI.playSound("/assets/toilet_flush.wav");
         }
     }
 

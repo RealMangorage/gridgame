@@ -31,6 +31,10 @@ public class CacheAPI {
         }
     }
 
+    public static InputStream getResourceStreamInternal(String resourcePath) {
+        return CacheAPI.class.getResourceAsStream(resourcePath);
+    }
+
     public static Image byteArrayToImage(byte[] byteArray) {
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
