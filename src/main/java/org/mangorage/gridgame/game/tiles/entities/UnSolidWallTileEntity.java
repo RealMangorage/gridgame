@@ -9,6 +9,7 @@ import org.mangorage.gridgame.registry.Tiles;
 public class UnSolidWallTileEntity extends TileEntity {
     private int ticks = 0;
     private boolean solid = false;
+    private boolean tick = false;
 
     public UnSolidWallTileEntity(int x, int y) {
         super(x, y);
@@ -20,7 +21,7 @@ public class UnSolidWallTileEntity extends TileEntity {
         if (ticks % 20 == 0) {
             solid = !solid;
         }
-        if (ticks % 2 == 0) {
+        if (ticks % 2 == 0 && tick) {
             Grid grid = Game.getInstance().getGrid();
             int sizeY = grid.getSizeY();
             if (getY() < sizeY) {

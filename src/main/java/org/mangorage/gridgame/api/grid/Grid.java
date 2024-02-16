@@ -1,7 +1,9 @@
 package org.mangorage.gridgame.api.grid;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
+import org.mangorage.gridgame.api.TilePos;
 import org.mangorage.gridgame.registry.TileRegistry;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
@@ -9,16 +11,14 @@ import org.mangorage.gridgame.registry.Tiles;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class Grid {
     // for Querying a specific x/y coordinate
-    private final GridTile[][] tiles;
+    private final byte[][] tiles;
+    private final Long2ObjectArrayMap<ITileEntity> tile_entities = new Long2ObjectArrayMap<>();
 
     // for general looping, if you want to go through all the tiles and tick them
-    private final List<GridTile> tilesList;
     private final int sizeX, sizeY;
 
     private int boundsX, boundsY;
@@ -29,14 +29,8 @@ public class Grid {
         this.sizeY = y;
         this.boundsX = boundsX;
         this.boundsY = boundsY;
-        this.tiles = new GridTile[x][y];
+        this.tiles = new byte[x][y];
         populate(border);
-
-        List<GridTile> tileList = new ArrayList<>();
-        for (GridTile[] tile : tiles)
-            tileList.addAll(Arrays.asList(tile));
-
-        this.tilesList = List.copyOf(tileList);
     }
 
     public Grid(int x, int y, int bX, int bY) {
@@ -44,12 +38,7 @@ public class Grid {
     }
 
     public void tick() {
-        tilesList.forEach(gridTile -> {
-            var tileEntity = gridTile.getTileEntity();
-            if (tileEntity != null)
-                tileEntity.tick();
-        });
-
+        tile_entities.forEach((aLong, iTileEntity) -> iTileEntity.tick());
         if (getNextLayer() != null) getNextLayer().tick();
     }
 
@@ -71,6 +60,10 @@ public class Grid {
         return nextLayer;
     }
 
+    public byte[][] getGridData() {
+        return tiles;
+    }
+
     public int getSizeX() {
         return sizeX;
     }
@@ -87,14 +80,38 @@ public class Grid {
         return boundsY;
     }
 
+
     public GridTile getGridTile(int x, int y) {
-        if (tiles[x][y] == null) tiles[x][y] = new GridTile(x, y);
-        return tiles[x][y];
+        return new GridTile(
+                x,
+                y,
+                TileRegistry.getInstance().getTile(tiles[x][y]),
+                tile_entities.get(TilePos.pack(x, y))
+                );
     }
 
-    public void setTile(int x, int y, ITile tile) {
-        if (tiles[x][y] == null) tiles[x][y] = new GridTile(x, y);
-        tiles[x][y].setTile(tile);
+    public GridTile setTile(int x, int y, ITile tile) {
+        tiles[x][y] = TileRegistry.getInstance().getID(tile);
+        var packedPos = TilePos.pack(x, y);
+        if (tile instanceof IEntityTile<?> entityTile) {
+            var entity = entityTile.createTileEntity(x, y);
+            tile_entities.put(packedPos, entity);
+            return new GridTile(
+                    x,
+                    y,
+                    tile,
+                    entity
+            );
+        } else {
+            tile_entities.remove(packedPos);
+        }
+
+        return new GridTile(
+                x,
+                y,
+                tile,
+                null
+        );
     }
 
     private void populate(boolean border) {
@@ -150,48 +167,47 @@ public class Grid {
             getNextLayer().render(graphics);
     }
 
+    public void load(byte[][] data) {
+        for (int x = 0; x < data.length; x++) {
+            for (int y = 0; y < data[x].length; y++) {
+                setTile(x, y, TileRegistry.getInstance().getTile(data[x][y]));
+            }
+        }
+    }
+
     public void save(CompoundTag tag) {
         ListTag<CompoundTag> tilesTags = new ListTag<>(CompoundTag.class);
-        var map = TileRegistry.getInstance().getTileLookup();
 
-        tilesList.forEach(gridTile -> {
-            if (gridTile.getTile().canSave()) {
-                CompoundTag tileTag = new CompoundTag();
-                String id = TileRegistry.getInstance().getID(gridTile.getTile());
-                int x = gridTile.getX();
-                int y = gridTile.getY();
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                var tile = getGridTile(x, y);
+                if (tile.getTile().canSave() && tile.getTileEntity() != null) {
+                    var packedPos = TilePos.pack(tile.getX(), tile.getY());
+                    var TE = tile.getTileEntity();
 
-                tileTag.putShort("id", map.get(id));
-                tileTag.putInt("x", x);
-                tileTag.putInt("y", y);
+                    CompoundTag tileTag = new CompoundTag();
+                    tileTag.putLong("packedPos", packedPos);
 
-                // TODO: Tack on TileData
-                var TE = gridTile.getTileEntity();
-                if (TE != null) {
-                    CompoundTag tileDataTag = new CompoundTag();
-                    TE.save(tileDataTag);
-                    tileTag.put("tileData", tileDataTag);
+                    CompoundTag tileEntityTag = new CompoundTag();
+                    TE.save(tileEntityTag);
+                    tileTag.put("tileData", tileEntityTag);
+
+                    tilesTags.add(tileTag);
                 }
-
-                tilesTags.add(tileTag);
             }
-        });
+        }
+
         tag.put("tiles", tilesTags);
     }
 
-    public void load(CompoundTag tag, Map<Short, String> tileLookup) {
+    public void load(CompoundTag tag) {
         ListTag<CompoundTag> tilesTags = tag.getListTag("tiles").asCompoundTagList();
 
         tilesTags.forEach(tile -> {
-            String id = tileLookup.get(tile.getShort("id"));
-            var x = tile.getInt("x");
-            var y = tile.getInt("y");
-
-            getGridTile(x, y).setTile(TileRegistry.getInstance().getTile(id));
-            var TE = getGridTile(x, y).getTileEntity();
-            if (TE != null && tile.containsKey("tileData")) {
-                TE.load(tile.getCompoundTag("tileData"));
-            }
+            var pos = TilePos.unPack(tile.getLong("packedPos"));
+            var gridTile = getGridTile(pos.x(), pos.y());
+            if (tile.containsKey("tileData") && gridTile.getTileEntity() != null)
+                gridTile.getTileEntity().load(tile.getCompoundTag("tileData"));
         });
     }
 }

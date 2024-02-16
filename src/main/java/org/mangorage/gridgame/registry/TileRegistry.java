@@ -1,12 +1,11 @@
 package org.mangorage.gridgame.registry;
 
-import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.ListTag;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ByteArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import org.mangorage.gridgame.api.grid.ITile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TileRegistry {
     private final static TileRegistry TILE_REGISTRY = new TileRegistry();
@@ -15,51 +14,21 @@ public class TileRegistry {
         return TILE_REGISTRY;
     }
 
-    private final Map<String, ITile> TILES = new HashMap<>();
-    private final Map<ITile, String> TILES_ID_LOOKUP = new HashMap<>();
-    private Map<String, Short> TILE_LOOKUP;
+    private final Byte2ObjectMap<ITile> TILES = new Byte2ObjectArrayMap<>();
+    private final Object2ByteMap<ITile> TILES_REVERSED = new Object2ByteArrayMap<>();
 
-    public static Map<Short, String> getTileLookupFromTag(ListTag<CompoundTag> lookup) {
-        Map<Short, String> lookupMap = new HashMap<>();
-        lookup.forEach(tag -> {
-            lookupMap.put(
-                    tag.getShort("idShort"),
-                    tag.getString("id")
-            );
-        });
-        return lookupMap;
-    }
-
-    public <T extends ITile> T register(String id, T tile) {
+    public <T extends ITile> T register(int idInt, T tile) {
+        var id = (byte) idInt;
         TILES.put(id, tile);
-        TILES_ID_LOOKUP.put(tile, id);
+        TILES_REVERSED.put(tile, id);
         return tile;
     }
 
-    public ITile getTile(String id) {
+    public ITile getTile(byte id) {
         return TILES.get(id);
     }
 
-    public String getID(ITile tile) {
-        return TILES_ID_LOOKUP.get(tile);
+    public byte getID(ITile tile) {
+        return TILES_REVERSED.getByte(tile);
     }
-
-    public void createTileLookup() {
-        if (TILE_LOOKUP != null) return;
-
-        Map<String, Short> data = new HashMap<>();
-        AtomicReference<Short> count = new AtomicReference<>((short) 0);
-
-        TILES.forEach((k, v) -> {
-            data.put(k, count.get());
-            count.set((short) (count.get() + 1));
-        });
-
-        this.TILE_LOOKUP = data;
-    }
-
-    public Map<String, Short> getTileLookup() {
-        return TILE_LOOKUP;
-    }
-
 }

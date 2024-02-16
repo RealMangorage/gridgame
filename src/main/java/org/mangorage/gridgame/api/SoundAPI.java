@@ -5,7 +5,7 @@ import javax.sound.sampled.AudioSystem;
 
 public class SoundAPI {
     public static void playSound(String path) {
-        var sfx = CacheAPI.getResourceStreamInternal(path);
+        var sfx = CacheAPI.getResourceStreamInternalAsBuffer(path);
         if (sfx == null)
             return;
         try {

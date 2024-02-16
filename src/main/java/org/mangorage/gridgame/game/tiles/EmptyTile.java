@@ -10,6 +10,7 @@ public class EmptyTile implements ITile {
     }
 
     @Override
+    @Deprecated
     public boolean canSave() {
         return false;
     }

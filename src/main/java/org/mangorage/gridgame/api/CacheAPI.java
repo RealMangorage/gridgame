@@ -3,6 +3,7 @@ package org.mangorage.gridgame.api;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +34,11 @@ public class CacheAPI {
 
     public static InputStream getResourceStreamInternal(String resourcePath) {
         return CacheAPI.class.getResourceAsStream(resourcePath);
+    }
+
+    public static BufferedInputStream getResourceStreamInternalAsBuffer(String resourcePath) {
+        var stream = getResourceStreamInternal(resourcePath);
+        return stream != null ? new BufferedInputStream(stream) : null;
     }
 
     public static Image byteArrayToImage(byte[] byteArray) {

@@ -1,11 +1,18 @@
-import java.nio.file.Files
-
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.github.johnrengelman:shadow:8.1.1'
+    }
 }
 
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+
 group = 'org.mangorage'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 repositories {
     mavenCentral()
@@ -19,6 +26,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     implementation 'com.github.Querz:NBT:6.1'
+    implementation 'fastutil:fastutil:5.0.9'
+    implementation 'org.apache.commons:commons-compress:+'
+    implementation 'org.tukaani:xz:1.8'
+    implementation 'com.github.luben:zstd-jni:1.5.5-11'
+
+    shadow('fastutil:fastutil:5.0.9')
+    shadow('com.github.Querz:NBT:6.1')
 }
 
 test {
@@ -46,3 +60,5 @@ task runGame(type: JavaExec) {
         runDir.mkdirs()
     }
 }
+
+tasks.build.dependsOn(tasks.shadowJar)

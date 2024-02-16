@@ -2,19 +2,14 @@ package org.mangorage.gridgame.api.grid;
 
 public final class GridTile {
     private final int x, y;
-    private ITile tile;
-    private ITileEntity entity;
+    private final ITile tile;
+    private final ITileEntity entity;
 
-    public GridTile(int x, int y) {
+    public GridTile(int x, int y, ITile tile, ITileEntity tileEntity) {
         this.x = x;
         this.y = y;
-    }
-
-    public void setTile(ITile tile) {
         this.tile = tile;
-        this.entity = null;
-        if (tile instanceof IEntityTile<?> entityTile)
-            this.entity = entityTile.createTileEntity(x, y);
+        this.entity = tileEntity;
     }
 
     public int getX() {
