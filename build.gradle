@@ -29,10 +29,6 @@ dependencies {
     implementation 'fastutil:fastutil:5.0.9'
     implementation 'org.apache.commons:commons-compress:+'
     implementation 'org.tukaani:xz:1.8'
-    implementation 'com.github.luben:zstd-jni:1.5.5-11'
-
-    shadow('fastutil:fastutil:5.0.9')
-    shadow('com.github.Querz:NBT:6.1')
 }
 
 test {
