@@ -6,7 +6,6 @@ import net.querz.nbt.tag.ListTag;
 import org.mangorage.gridgame.api.SoundAPI;
 import org.mangorage.gridgame.api.Util;
 import org.mangorage.gridgame.api.grid.Grid;
-import org.mangorage.gridgame.registry.TileRegistry;
 import org.mangorage.gridgame.registry.TileRenderers;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.render.RenderableScreen;
@@ -41,8 +40,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         return GAME;
     }
 
-    private final Grid grid = new Grid(10_000, 10_000, 160, 85);
-    private final Grid entityGrid = grid.createNewLayer();
+    private final Grid grid = new Grid(10_000, 10_000, 2, 160, 85);
     private final Player player = new Player();
 
     private int scale = 40;
@@ -55,9 +53,10 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
     public Game() {
         player.setX(1);
         player.setY(1);
-        player.setTile(entityGrid);
-        grid.setTile(5, 5, Tiles.UN_SOLID_TILE);
+        player.setTile(grid);
+        grid.setTile(5, 5, 0, Tiles.UN_SOLID_TILE);
         RenderableScreen.create();
+
     }
 
     @Override
@@ -92,19 +91,12 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
     }
 
     public Grid getGrid() {
-        return getGrid(0);
+        return grid;
     }
 
     public Player getPlayer() {
         return player;
     }
-
-    public Grid getGrid(int layer) {
-        if (layer == 0) return grid;
-        if (layer == 1) return entityGrid;
-        return null;
-    }
-
 
     public void render(Graphics graphics) {
         if (state == GameState.READY) {
@@ -130,7 +122,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
                 case KeyEvent.VK_D -> player.moveRight();
                 case KeyEvent.VK_SPACE -> {
                     SoundAPI.playSound("/assets/quick.wav");
-                    grid.setTile(player.getX(), player.getY(), Tiles.UN_SOLID_TILE);
+                    grid.setTile(player.getX(), player.getY(), 0, Tiles.UN_SOLID_TILE);
                 }
                 case KeyEvent.VK_F1 -> SAVE_EXECUTOR.execute(this::save);
                 case KeyEvent.VK_F4 -> SoundAPI.playSound("/assets/toilet_flush.wav");
@@ -157,23 +149,17 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         File gameDataTiles = new File("gamedata_tiles.raw");
 
         CompoundTag gameDataTag = new CompoundTag();
-        ListTag<CompoundTag> layerTags = new ListTag<>(CompoundTag.class);
 
         Grid grid = getGrid();
-        List<byte[][]> tilesData = new ArrayList<>();
-        while (grid != null) {
-            CompoundTag layer = new CompoundTag();
-            grid.save(layer);
-            layerTags.add(layer);
-            tilesData.add(grid.getGridData());
-            grid = grid.getNextLayer();
-        }
+        byte[][][] tilesData = grid.getGridData();
+        CompoundTag gridData = new CompoundTag();
+        grid.save(gridData);
 
         CompoundTag playerDataTag = new CompoundTag();
         playerDataTag.putInt("x", player.getX());
         playerDataTag.putInt("y", player.getY());
 
-        gameDataTag.put("layers", layerTags);
+        gameDataTag.put("gridData", gridData);
         gameDataTag.put("playerData", playerDataTag);
 
         try {
@@ -187,7 +173,6 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void load() {
@@ -203,33 +188,28 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
 
                 var gridData = Util.deserializeIntArray2D(gameDataTilesDecompressed);
                 gameDataTilesDecompressed.delete();
-                Grid gridLayer = getGrid();
-                for (byte[][] grid : gridData) {
-                    gridLayer.load(grid);
-                    gridLayer = gridLayer.getNextLayer();
-                }
+
+                getGrid().load(gridData);
 
                 CompoundTag gameDataTag = (CompoundTag) NBTUtil.read(gameDataDecompressed, true).getTag();
                 gameDataDecompressed.delete();
-                ListTag<CompoundTag> layers = gameDataTag.getListTag("layers").asCompoundTagList();
+
+                CompoundTag gridDataTag = gameDataTag.getCompoundTag("gridData");
 
                 Grid grid = getGrid();
-                for (CompoundTag layer : layers) {
-                    grid.load(layer);
-                    if (grid.getNextLayer() != null) {
-                        grid = grid.getNextLayer();
-                    }
-                }
+                grid.load(gridDataTag);
 
                 CompoundTag playerData = gameDataTag.getCompoundTag("playerData");
                 int x = playerData.getInt("x");
                 int y = playerData.getInt("y");
-                player.updatePosition(entityGrid, x, y);
+                player.updatePosition(grid, x, y);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
                 state = GameState.READY;
             }
+        } else {
+            state = GameState.READY;
         }
     }
 

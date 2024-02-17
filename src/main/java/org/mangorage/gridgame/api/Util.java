@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Util {
     public static void compressFile(File sourceFilePath, String compressedFilePath) throws IOException {
@@ -44,18 +42,11 @@ public class Util {
         return new File(decompressedFilePath);
     }
 
-    public static void serializeIntArray2D(List<byte[][]> data, File filename) {
+    public static void serializeIntArray2D(byte[][][] grid, File filename) {
         try {
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeInt(data.size());
-            data.forEach(arr -> {
-                try {
-                    out.writeObject(arr);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            out.writeObject(grid);
             out.close();
             fileOut.close();
         } catch (IOException i) {
@@ -63,23 +54,18 @@ public class Util {
         }
     }
 
-    public static List<byte[][]> deserializeIntArray2D(File filename) {
-        List<byte[][]> grids = new ArrayList<>();
+    public static byte[][][] deserializeIntArray2D(File filename) {
+        byte[][][] gridData = null;
         try {
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            int size = in.readInt();
-
-            for (int i = 0; i < size; i++) {
-                grids.add((byte[][]) in.readObject());
-            }
-
+            gridData = (byte[][][]) in.readObject();
             in.close();
             fileIn.close();
             System.out.println("2D Array deserialized successfully.");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return grids;
+        return gridData;
     }
 }

@@ -27,8 +27,7 @@ public class TileRenderers {
                 Tiles.UN_SOLID_TILE,
                 UnSolidWallTileEntity.class,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
-                    //var texture = tileEntity.isSolid() ? CacheAPI.getInternalImage("/assets/stone.png") : CacheAPI.getInternalImage("/assets/cobblestone.png");
-                    var texture = CacheAPI.getInternalImage("/assets/stone.png");
+                    var texture = tileEntity.isSolid() ? CacheAPI.getInternalImage("/assets/stone.png") : CacheAPI.getInternalImage("/assets/cobblestone.png");
                     graphics.drawImage(texture, (x - offsetX) * width, (y - offsetY) * height, width, height, null);
                 }
         );

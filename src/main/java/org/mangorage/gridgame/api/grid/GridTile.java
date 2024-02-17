@@ -1,13 +1,14 @@
 package org.mangorage.gridgame.api.grid;
 
 public final class GridTile {
-    private final int x, y;
+    private final int x, y, z;
     private final ITile tile;
     private final ITileEntity entity;
 
-    public GridTile(int x, int y, ITile tile, ITileEntity tileEntity) {
+    public GridTile(int x, int y, int z, ITile tile, ITileEntity tileEntity) {
         this.x = x;
         this.y = y;
+        this.z = z;
         this.tile = tile;
         this.entity = tileEntity;
     }
@@ -18,6 +19,10 @@ public final class GridTile {
 
     public int getY() {
         return y;
+    }
+
+    public int getZ() {
+        return z;
     }
 
     public ITile getTile() {
@@ -32,10 +37,5 @@ public final class GridTile {
     public <T extends ITileEntity> T getTileEntity(Class<T> tileClass) {
         if (entity == null) return null;
         return (T) entity;
-    }
-
-    @Deprecated
-    public ITile get() {
-        return tile;
     }
 }

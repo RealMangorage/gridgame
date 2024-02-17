@@ -10,42 +10,32 @@ import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Tiles;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Grid {
+public final class Grid {
     // for Querying a specific x/y coordinate
-    private final byte[][] tiles;
+    private final byte[][][] tiles;
     private final Long2ObjectArrayMap<ITileEntity> tile_entities = new Long2ObjectArrayMap<>();
 
-    // for general looping, if you want to go through all the tiles and tick them
-    private final int sizeX, sizeY;
 
+    private final int sizeX, sizeY, sizeZ;
     private int boundsX, boundsY;
-    private Grid nextLayer;
 
-    public Grid(int x, int y, int boundsX, int boundsY, boolean border) {
+    public Grid(int x, int y, int z, int boundsX, int boundsY, boolean border) {
         this.sizeX = x;
         this.sizeY = y;
+        this.sizeZ = z;
         this.boundsX = boundsX;
         this.boundsY = boundsY;
-        this.tiles = new byte[x][y];
+        this.tiles = new byte[z][x][y];
         populate(border);
     }
 
-    public Grid(int x, int y, int bX, int bY) {
-        this(x, y, bX, bY, true);
+    public Grid(int x, int y, int z, int bX, int bY) {
+        this(x, y, z, bX, bY, true);
     }
 
     public void tick() {
         tile_entities.forEach((aLong, iTileEntity) -> iTileEntity.tick());
-        if (getNextLayer() != null) getNextLayer().tick();
-    }
-
-    public Grid createNewLayer() {
-        if (this.nextLayer != null) return nextLayer;
-        this.nextLayer = new Grid(sizeX, sizeY, boundsX, boundsY, false);
-        return nextLayer;
     }
 
     public void updateBounds(int x, int y) {
@@ -53,14 +43,10 @@ public class Grid {
             this.boundsX = Math.min(x, sizeX);
         if (y > 5)
             this.boundsY = Math.min(sizeY, y);
-        if (getNextLayer() != null) getNextLayer().updateBounds(x, y);
     }
 
-    public Grid getNextLayer() {
-        return nextLayer;
-    }
 
-    public byte[][] getGridData() {
+    public byte[][][] getGridData() {
         return tiles;
     }
 
@@ -81,24 +67,26 @@ public class Grid {
     }
 
 
-    public GridTile getGridTile(int x, int y) {
+    public GridTile getGridTile(int x, int y, int z) {
         return new GridTile(
-                x,
-                y,
-                TileRegistry.getInstance().getTile(tiles[x][y]),
-                tile_entities.get(TilePos.pack(x, y))
+                    x,
+                    y,
+                    z,
+                    TileRegistry.getInstance().getTile(tiles[z][x][y]),
+                    tile_entities.get(TilePos.pack(x, y, z))
                 );
     }
 
-    public GridTile setTile(int x, int y, ITile tile) {
-        tiles[x][y] = TileRegistry.getInstance().getID(tile);
-        var packedPos = TilePos.pack(x, y);
+    public GridTile setTile(int x, int y, int z, ITile tile) {
+        tiles[z][x][y] = TileRegistry.getInstance().getID(tile);
+        var packedPos = TilePos.pack(x, y, z);
         if (tile instanceof IEntityTile<?> entityTile) {
-            var entity = entityTile.createTileEntity(x, y);
+            var entity = entityTile.createTileEntity(this, x, y, z);
             tile_entities.put(packedPos, entity);
             return new GridTile(
                     x,
                     y,
+                    z,
                     tile,
                     entity
             );
@@ -109,6 +97,7 @@ public class Grid {
         return new GridTile(
                 x,
                 y,
+                z,
                 tile,
                 null
         );
@@ -118,9 +107,9 @@ public class Grid {
         for (int x = 0; x < this.sizeX; x++) {
             for (int y = 0; y < this.sizeY; y++) {
                 if (border && (x == 0 || y == 0 || x == sizeX - 1 || y == sizeY - 1)) {
-                    setTile(x, y, Tiles.WALL_TILE);
+                    setTile(x, y, 0, Tiles.WALL_TILE);
                 } else {
-                    setTile(x, y, Tiles.EMPTY_TILE);
+                    setTile(x, y, 0, Tiles.EMPTY_TILE);
                 }
             }
         }
@@ -140,59 +129,62 @@ public class Grid {
         if (plrY > boundsY)
             oY = plrY - boundsY;
 
-        for (int x = oX; x < Math.min(oX + boundsX + 3, sizeX); x++) {
-            for (int y = oY; y < Math.min(oY + boundsY + 3, sizeY); y++) {
-                var GridTile = getGridTile(x, y);
-                var tile = GridTile.getTile();
-                var tileEntity = GridTile.getTileEntity();
+        for (int z = 0; z < sizeZ; z++) {
+            for (int x = oX; x < Math.min(oX + boundsX + 3, sizeX); x++) {
+                for (int y = oY; y < Math.min(oY + boundsY + 3, sizeY); y++) {
+                    var GridTile = getGridTile(x, y, z);
+                    var tile = GridTile.getTile();
+                    var tileEntity = GridTile.getTileEntity();
 
-                var manager = RenderManager.getInstance();
-                var renderer = manager.getRenderer(tile);
-                if (renderer == null) continue;
-                renderer.render(
-                        graphics,
-                        tile,
-                        tileEntity,
-                        x,
-                        y,
-                        oX,
-                        oY,
-                        scale,
-                        scale
-                );
+                    var manager = RenderManager.getInstance();
+                    var renderer = manager.getRenderer(tile);
+                    if (renderer == null) continue;
+                    renderer.render(
+                            graphics,
+                            tile,
+                            tileEntity,
+                            x,
+                            y,
+                            oX,
+                            oY,
+                            scale,
+                            scale
+                    );
+                }
             }
         }
-
-        if (getNextLayer() != null)
-            getNextLayer().render(graphics);
     }
 
-    public void load(byte[][] data) {
-        for (int x = 0; x < data.length; x++) {
-            for (int y = 0; y < data[x].length; y++) {
-                setTile(x, y, TileRegistry.getInstance().getTile(data[x][y]));
+    public void load(byte[][][] data) {
+        for (int z = 0; z < sizeZ; z++) {
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    setTile(x, y, z, TileRegistry.getInstance().getTile(data[z][x][y]));
+                }
             }
         }
+
     }
 
     public void save(CompoundTag tag) {
         ListTag<CompoundTag> tilesTags = new ListTag<>(CompoundTag.class);
+        for (int z = 0; z < sizeZ; z++) {
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    var tile = getGridTile(x, y, z);
+                    if (tile.getTile().canSave() && tile.getTileEntity() != null) {
+                        var packedPos = TilePos.pack(tile.getX(), tile.getY(), tile.getZ());
+                        var TE = tile.getTileEntity();
 
-        for (int x = 0; x < sizeX; x++) {
-            for (int y = 0; y < sizeY; y++) {
-                var tile = getGridTile(x, y);
-                if (tile.getTile().canSave() && tile.getTileEntity() != null) {
-                    var packedPos = TilePos.pack(tile.getX(), tile.getY());
-                    var TE = tile.getTileEntity();
+                        CompoundTag tileTag = new CompoundTag();
+                        tileTag.putLong("packedPos", packedPos);
 
-                    CompoundTag tileTag = new CompoundTag();
-                    tileTag.putLong("packedPos", packedPos);
+                        CompoundTag tileEntityTag = new CompoundTag();
+                        TE.save(tileEntityTag);
+                        tileTag.put("tileData", tileEntityTag);
 
-                    CompoundTag tileEntityTag = new CompoundTag();
-                    TE.save(tileEntityTag);
-                    tileTag.put("tileData", tileEntityTag);
-
-                    tilesTags.add(tileTag);
+                        tilesTags.add(tileTag);
+                    }
                 }
             }
         }
@@ -205,9 +197,10 @@ public class Grid {
 
         tilesTags.forEach(tile -> {
             var pos = TilePos.unPack(tile.getLong("packedPos"));
-            var gridTile = getGridTile(pos.x(), pos.y());
+            var gridTile = getGridTile(pos.x(), pos.y(), pos.z());
             if (tile.containsKey("tileData") && gridTile.getTileEntity() != null)
                 gridTile.getTileEntity().load(tile.getCompoundTag("tileData"));
         });
+
     }
 }

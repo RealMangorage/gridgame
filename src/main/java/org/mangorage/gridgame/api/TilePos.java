@@ -2,26 +2,32 @@ package org.mangorage.gridgame.api;
 
 import org.mangorage.gridgame.registry.Tiles;
 
-public record TilePos(int x, int y) {
-    public static long pack(int x, int y) {
-        // Pack the two integers into a single long
-        // Shift the first integer to the left by 32 bits and then combine it with the second integer using bitwise OR
-        return ((long) x << 32) | (y & 0xFFFFFFFFL);
+public record TilePos(int x, int y, int z) {
+    public static long pack(int x, int y, int z) {
+        // Pack the three integers into a single long
+        // Shift x to the left by 42 bits, y by 21 bits, then combine with z using bitwise OR
+        return ((long) x << 42) | ((long) y << 21) | (z & 0x1FFFFFL);
     }
 
     public static TilePos unPack(long packedLong) {
-        return new TilePos(unpackX(packedLong), unpackY(packedLong));
+        return new TilePos(unpackX(packedLong), unpackY(packedLong), unpackZ(packedLong));
     }
 
     private static int unpackX(long packedLong) {
-        // Extract the first integer from the packed long
-        // Shift the packed long to the right by 32 bits
-        return (int) (packedLong >> 32);
+        // Extract the x coordinate from the packed long
+        // Shift packedLong to the right by 42 bits
+        return (int) (packedLong >> 42);
     }
 
     private static int unpackY(long packedLong) {
-        // Extract the second integer from the packed long
-        // Perform a bitwise AND operation with 0xFFFFFFFF to get the last 32 bits
-        return (int) (packedLong & 0xFFFFFFFFL);
+        // Extract the y coordinate from the packed long
+        // Shift packedLong to the right by 21 bits, then perform bitwise AND with 0x1FFFFF
+        return (int) ((packedLong >> 21) & 0x1FFFFF);
+    }
+
+    private static int unpackZ(long packedLong) {
+        // Extract the z coordinate from the packed long
+        // Perform bitwise AND operation with 0x1FFFFF to get the last 21 bits
+        return (int) (packedLong & 0x1FFFFFL);
     }
 }

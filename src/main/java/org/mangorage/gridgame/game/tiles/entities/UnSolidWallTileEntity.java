@@ -3,7 +3,6 @@ package org.mangorage.gridgame.game.tiles.entities;
 import net.querz.nbt.tag.CompoundTag;
 import org.mangorage.gridgame.api.grid.Grid;
 import org.mangorage.gridgame.api.grid.ITile;
-import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Tiles;
 
 public class UnSolidWallTileEntity extends TileEntity {
@@ -11,8 +10,8 @@ public class UnSolidWallTileEntity extends TileEntity {
     private boolean solid = false;
     private boolean tick = false;
 
-    public UnSolidWallTileEntity(int x, int y) {
-        super(x, y);
+    public UnSolidWallTileEntity(Grid grid, int x, int y, int z) {
+        super(grid, x, y, z);
     }
 
     @Override
@@ -22,15 +21,15 @@ public class UnSolidWallTileEntity extends TileEntity {
             solid = !solid;
         }
         if (ticks % 2 == 0 && tick) {
-            Grid grid = Game.getInstance().getGrid();
+            Grid grid = getGrid();
             int sizeY = grid.getSizeY();
             if (getY() < sizeY) {
                 int newY = getY() + 1;
-                ITile tile = grid.getGridTile(getX(), newY).getTile();
+                ITile tile = grid.getGridTile(getX(), newY, getZ()).getTile();
                 if (tile == Tiles.EMPTY_TILE) {
-                    grid.setTile(getX(), getY(), Tiles.EMPTY_TILE);
-                    grid.setTile(getX(), newY, Tiles.UN_SOLID_TILE);
-                    var entity = grid.getGridTile(getX(), newY).getTileEntity(this.getClass());
+                    grid.setTile(getX(), getY(), 0, Tiles.EMPTY_TILE);
+                    grid.setTile(getX(), newY, 0, Tiles.UN_SOLID_TILE);
+                    var entity = grid.getGridTile(getX(), newY, getZ()).getTileEntity(this.getClass());
                     if (entity != null) {
                         entity.setSolid(solid);
                         entity.setTicks(ticks);

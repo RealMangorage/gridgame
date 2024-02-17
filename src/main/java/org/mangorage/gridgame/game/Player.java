@@ -16,8 +16,8 @@ public class Player {
     }
 
     public void updatePosition(Grid grid, int newX, int newY) {
-        grid.setTile(x, y, Tiles.EMPTY_TILE);
-        grid.setTile(newX, newY, Tiles.PLAYER_TILE);
+        grid.setTile(x, y, 1, Tiles.EMPTY_TILE);
+        grid.setTile(newX, newY, 1, Tiles.PLAYER_TILE);
 
         this.x = newX;
         this.y = newY;
@@ -32,20 +32,20 @@ public class Player {
     }
 
     public void setTile(Grid grid) {
-        grid.setTile(x, y, Tiles.PLAYER_TILE);
+        grid.setTile(x, y, 1, Tiles.PLAYER_TILE);
     }
 
     public void removeTile(Grid grid) {
-        grid.setTile(x, y, Tiles.EMPTY_TILE);
+        grid.setTile(x, y, 1, Tiles.EMPTY_TILE);
     }
 
     public void moveDown() {
         int newY = y + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY < grid.getSizeY()) {
-            ITile walkTo = grid.getGridTile(x, newY).getTile();
-            if (!walkTo.isSolid(x, newY)) {
-                updatePosition(Game.getInstance().getGrid(1), x, newY);
+            ITile walkTo = grid.getGridTile(x, newY, 0).getTile();
+            if (!walkTo.isSolid(grid, x, newY)) {
+                updatePosition(grid, x, newY);
             }
         }
     }
@@ -54,9 +54,9 @@ public class Player {
         int newY = y - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY != -1) {
-            ITile walkTo = grid.getGridTile(x, newY).getTile();
-            if (!walkTo.isSolid(x, newY)) {
-                updatePosition(Game.getInstance().getGrid(1), x, newY);
+            ITile walkTo = grid.getGridTile(x, newY, 0).getTile();
+            if (!walkTo.isSolid(grid, x, newY)) {
+                updatePosition(grid, x, newY);
             }
         }
     }
@@ -65,9 +65,9 @@ public class Player {
         int newX = x - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX != -1) {
-            ITile walkTo = grid.getGridTile(newX, y).getTile();
-            if (!walkTo.isSolid(newX, y)) {
-                updatePosition(Game.getInstance().getGrid(1), newX, y);
+            ITile walkTo = grid.getGridTile(newX, y, 0).getTile();
+            if (!walkTo.isSolid(grid, newX, y)) {
+                updatePosition(grid, newX, y);
             }
         }
     }
@@ -76,9 +76,9 @@ public class Player {
         int newX = x + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX < grid.getSizeX()) {
-            ITile walkTo = grid.getGridTile(newX, y).getTile();
-            if (!walkTo.isSolid(newX, y)) {
-                updatePosition(Game.getInstance().getGrid(1), newX, y);
+            ITile walkTo = grid.getGridTile(newX, y, 0).getTile();
+            if (!walkTo.isSolid(grid, newX, y)) {
+                updatePosition(grid, newX, y);
             }
         }
     }
