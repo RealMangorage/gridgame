@@ -12,6 +12,8 @@ import org.mangorage.gridgame.render.RenderableScreen;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -20,7 +22,7 @@ import java.nio.file.Files;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Game extends Thread implements KeyListener, MouseWheelListener {
+public class Game extends Thread implements KeyListener, MouseWheelListener, MouseListener {
     private static final ExecutorService SAVE_EXECUTOR = Executors.newSingleThreadExecutor();
 
     public static void init() {
@@ -35,13 +37,15 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         return GAME;
     }
 
-    private final Grid grid = new Grid(10_000, 10_000, 2, 160, 85);
+    private final Grid grid = new Grid(100, 10_000, 2, 20, 20);
     private final Player player = new Player();
 
     private int scale = 40;
     private boolean running = true;
     private int tickRate = 20;
     private int ticks = 0;
+    private long msPerTick = 0;
+    private boolean debug = false;
 
     private GameState state = GameState.LOADING;
 
@@ -49,7 +53,6 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         player.setX(1);
         player.setY(1);
         player.setTile(grid);
-        grid.setTile(5, 5, 0, Tiles.UN_SOLID_TILE.get());
         RenderableScreen.create();
 
     }
@@ -67,14 +70,28 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
     }
 
     public void tick() {
+        long start = System.currentTimeMillis();
         if (state == GameState.READY) {
             ticks++;
             grid.tick();
         }
+        msPerTick = System.currentTimeMillis() - start;
     }
 
     public int getTicks() {
         return ticks;
+    }
+
+    public int getTickRate() {
+        return tickRate;
+    }
+
+    public long getLastMSPerTick() {
+        return msPerTick;
+    }
+
+    public boolean showDebug() {
+        return debug;
     }
 
     public int getScale() {
@@ -125,6 +142,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
                 case KeyEvent.VK_DOWN -> grid.updateBounds(grid.getBoundsX(), grid.getBoundsY() + 1);
                 case KeyEvent.VK_G -> grid.updateBounds(grid.getBoundsX() - 1, grid.getBoundsY());
                 case KeyEvent.VK_H -> grid.updateBounds(grid.getBoundsX() + 1, grid.getBoundsY());
+                case KeyEvent.VK_F3 -> debug = !debug;
             }
         }
     }
@@ -221,5 +239,31 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         } else if (val < 0 && scale < 40) {
             scale = scale + 2;
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        var pos = Util.getTilePosFromMouse(scale, e.getX(), e.getY(), grid.getOffsetX(player), grid.getOffsetY(player));
+        grid.setTile(pos.x(), pos.y(), 0, Tiles.UN_SOLID_TILE.get());
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }

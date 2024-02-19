@@ -6,22 +6,9 @@ import org.mangorage.gridgame.api.grid.Grid;
 
 import java.util.Objects;
 
-public abstract sealed class TileEntity permits UnSolidWallTileEntity {
-    private final Grid grid;
+public abstract class TileEntity {
+   private final Grid grid;
     private final int x, y, z;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TileEntity that = (TileEntity) o;
-        return x == that.x && y == that.y && z == that.z && Objects.equals(grid, that.grid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y, z);
-    }
 
     public TileEntity(Grid grid, int x, int y, int z) {
         this.grid = grid;
@@ -47,5 +34,18 @@ public abstract sealed class TileEntity permits UnSolidWallTileEntity {
 
     public int getZ() {
         return z;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TileEntity that = (TileEntity) o;
+        return x == that.x && y == that.y && z == that.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 }

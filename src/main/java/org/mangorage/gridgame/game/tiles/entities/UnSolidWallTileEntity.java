@@ -19,7 +19,7 @@ public final class UnSolidWallTileEntity extends TileEntity {
         if (ticks % 20 == 0) {
             solid = !solid;
         }
-        if (ticks % 2 == 0 && tick) {
+        if (ticks % 2 == 0) {
             Grid grid = getGrid();
             int sizeY = grid.getSizeY();
             if (getY() < sizeY) {

@@ -1,12 +1,10 @@
 package org.mangorage.gridgame.api.grid;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
-import org.mangorage.gridgame.api.TilePos;
+import org.mangorage.gridgame.game.Player;
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.registry.core.Registries;
@@ -16,7 +14,6 @@ import org.mangorage.gridgame.game.Game;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Random;
 
 public final class Grid {
     // for Querying a specific x/y coordinate
@@ -42,9 +39,7 @@ public final class Grid {
     }
 
     public void tick() {
-        long start = System.currentTimeMillis();
         tile_entities_tickable.forEach((k, t) -> t.tick());
-        System.out.println(System.currentTimeMillis() - start);
     }
 
     public void updateBounds(int x, int y) {
@@ -75,6 +70,16 @@ public final class Grid {
         return boundsY;
     }
 
+    public int getOffsetX(Player player) {
+        var plrX = player.getX();
+        return plrX > boundsX ? plrX - boundsX : 0;
+    }
+
+    public int getOffsetY(Player player) {
+        var plrY = player.getY();
+        return plrY > boundsX ? plrY - boundsY : 0;
+    }
+
 
     public GridTile getGridTile(int x, int y, int z) {
         return new GridTile(
@@ -95,7 +100,6 @@ public final class Grid {
         tile_entities_tickable.remove(packedPos);
 
         if (tile instanceof IEntityTile entityTile) {
-            var a = 1;
             var entity = entityTile.createTileEntity(this, x, y, z);
             tile_entities.put(packedPos, entity);
             var tickable = entityTile.getTicker();
@@ -121,15 +125,10 @@ public final class Grid {
     }
 
     private void populate(boolean border) {
-        var ran = new Random();
-        int a = 0;
         for (int x = 0; x < this.sizeX; x++) {
             for (int y = 0; y < this.sizeY; y++) {
                 if (border && (x == 0 || y == 0 || x == sizeX - 1 || y == sizeY - 1)) {
                     setTile(x, y, 0, Tiles.WALL_TILE.get());
-                } else if (a < 1_000_000) {
-                    setTile(x, y, 0, Tiles.UN_SOLID_TILE.get());
-                    a++;
                 }
             }
         }

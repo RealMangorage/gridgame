@@ -25,11 +25,6 @@ public class UnSolidWallTile implements ITile, IEntityTile {
     }
 
     @Override
-    public IEntityTile getEntityTile() {
-        return this;
-    }
-
-    @Override
     public <T extends TileEntity> IEntityTicker<T> getTicker() {
         return (grid, x, y, z, tileEntity) -> ((UnSolidWallTileEntity) tileEntity).tick();
     }

@@ -2,6 +2,8 @@ package org.mangorage.gridgame.api;
 
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
+import org.mangorage.gridgame.api.grid.MousePos;
+import org.mangorage.gridgame.api.grid.TilePos;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -67,5 +69,11 @@ public class Util {
             e.printStackTrace();
         }
         return gridData;
+    }
+
+    public static MousePos getTilePosFromMouse(int scale, int mX, int mY, int oX, int oY) {
+        int x = (int) ((mX + 0.5 * scale) / scale) - 1;
+        int y = (int) ((mY + 0.5 * scale) / scale) - 1;
+        return new MousePos(x + oX, y + oY);
     }
 }
