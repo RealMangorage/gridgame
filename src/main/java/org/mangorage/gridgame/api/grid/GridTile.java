@@ -1,11 +1,13 @@
 package org.mangorage.gridgame.api.grid;
 
+import org.mangorage.gridgame.game.tiles.entities.TileEntity;
+
 public final class GridTile {
     private final int x, y, z;
     private final ITile tile;
-    private final ITileEntity entity;
+    private final TileEntity entity;
 
-    public GridTile(int x, int y, int z, ITile tile, ITileEntity tileEntity) {
+    public GridTile(int x, int y, int z, ITile tile, TileEntity tileEntity) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -29,12 +31,12 @@ public final class GridTile {
         return tile;
     }
 
-    public ITileEntity getTileEntity() {
+    public TileEntity getTileEntity() {
         return entity;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ITileEntity> T getTileEntity(Class<T> tileClass) {
+    public <T extends TileEntity> T getTileEntity(Class<T> tileClass) {
         if (entity == null) return null;
         return (T) entity;
     }

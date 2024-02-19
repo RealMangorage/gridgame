@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class RenderableScreen extends JPanel {
+    public static long lastUpdateMSLength = 0;
 
     private RenderableScreen() {
         Timer timer = new Timer();
@@ -21,10 +22,12 @@ public class RenderableScreen extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        long start = System.currentTimeMillis();
         super.paintComponent(g);
-        // Set background color
         setBackground(Color.BLACK);
         Game.getInstance().render(g);
+        lastUpdateMSLength = System.currentTimeMillis() - start;
+        //System.out.println(lastUpdateMSLength);
     }
 
     public static void create() {

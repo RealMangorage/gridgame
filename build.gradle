@@ -32,6 +32,7 @@ dependencies {
     implementation 'fastutil:fastutil:5.0.9'
     implementation 'org.apache.commons:commons-compress:+'
     implementation 'org.tukaani:xz:1.8'
+    implementation 'net.sf.trove4j:core:3.1.0'
 }
 
 test {

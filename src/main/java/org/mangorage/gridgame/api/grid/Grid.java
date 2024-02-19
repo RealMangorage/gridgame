@@ -1,21 +1,28 @@
 package org.mangorage.gridgame.api.grid;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import org.mangorage.gridgame.api.TilePos;
+import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.registry.core.Registries;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Random;
 
 public final class Grid {
     // for Querying a specific x/y coordinate
     private final byte[][][] tiles;
-    private final Long2ObjectArrayMap<ITileEntity> tile_entities = new Long2ObjectArrayMap<>();
-
+    private final Long2ObjectMap<TileEntity> tile_entities = new Long2ObjectOpenHashMap<>(100_000_000);
+    private final Long2ObjectMap<BoundTickableTileEntity<?>> tile_entities_tickable = new Long2ObjectOpenHashMap<>(100_000_000);
 
     private final int sizeX, sizeY, sizeZ;
     private int boundsX, boundsY;
@@ -35,7 +42,9 @@ public final class Grid {
     }
 
     public void tick() {
-        tile_entities.forEach((aLong, iTileEntity) -> iTileEntity.tick());
+        long start = System.currentTimeMillis();
+        tile_entities_tickable.forEach((k, t) -> t.tick());
+        System.out.println(System.currentTimeMillis() - start);
     }
 
     public void updateBounds(int x, int y) {
@@ -77,12 +86,21 @@ public final class Grid {
                 );
     }
 
+
     public GridTile setTile(int x, int y, int z, ITile tile) {
         tiles[z][x][y] = Registries.TILE_REGISTRY.getID(tile);
         var packedPos = TilePos.pack(x, y, z);
-        if (tile instanceof IEntityTile<?> entityTile) {
+
+        tile_entities.remove(packedPos);
+        tile_entities_tickable.remove(packedPos);
+
+        if (tile instanceof IEntityTile entityTile) {
+            var a = 1;
             var entity = entityTile.createTileEntity(this, x, y, z);
             tile_entities.put(packedPos, entity);
+            var tickable = entityTile.getTicker();
+            if (tickable != null)
+                tile_entities_tickable.put(packedPos, new BoundTickableTileEntity<>(tickable, this, x, y, z, entity));
             return new GridTile(
                     x,
                     y,
@@ -90,9 +108,8 @@ public final class Grid {
                     tile,
                     entity
             );
-        } else {
-            tile_entities.remove(packedPos);
         }
+
 
         return new GridTile(
                 x,
@@ -104,12 +121,15 @@ public final class Grid {
     }
 
     private void populate(boolean border) {
+        var ran = new Random();
+        int a = 0;
         for (int x = 0; x < this.sizeX; x++) {
             for (int y = 0; y < this.sizeY; y++) {
                 if (border && (x == 0 || y == 0 || x == sizeX - 1 || y == sizeY - 1)) {
                     setTile(x, y, 0, Tiles.WALL_TILE.get());
-                } else {
-                    setTile(x, y, 0, Tiles.EMPTY_TILE.get());
+                } else if (a < 1_000_000) {
+                    setTile(x, y, 0, Tiles.UN_SOLID_TILE.get());
+                    a++;
                 }
             }
         }
@@ -201,6 +221,18 @@ public final class Grid {
             if (tile.containsKey("tileData") && gridTile.getTileEntity() != null)
                 gridTile.getTileEntity().load(tile.getCompoundTag("tileData"));
         });
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grid grid = (Grid) o;
+        return sizeX == grid.sizeX && sizeY == grid.sizeY && sizeZ == grid.sizeZ && boundsX == grid.boundsX && boundsY == grid.boundsY && Objects.deepEquals(tiles, grid.tiles) && Objects.equals(tile_entities, grid.tile_entities) && Objects.equals(tile_entities_tickable, grid.tile_entities_tickable);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.deepHashCode(tiles), tile_entities, tile_entities_tickable, sizeX, sizeY, sizeZ, boundsX, boundsY);
     }
 }

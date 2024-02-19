@@ -5,16 +5,15 @@ import org.mangorage.gridgame.api.grid.Grid;
 import org.mangorage.gridgame.api.grid.ITile;
 import org.mangorage.gridgame.registry.Tiles;
 
-public class UnSolidWallTileEntity extends TileEntity {
+public final class UnSolidWallTileEntity extends TileEntity {
     private int ticks = 0;
     private boolean solid = false;
-    private boolean tick = false;
+    private final boolean tick = false;
 
     public UnSolidWallTileEntity(Grid grid, int x, int y, int z) {
         super(grid, x, y, z);
     }
 
-    @Override
     public void tick() {
         ticks++;
         if (ticks % 20 == 0) {
