@@ -1,7 +1,5 @@
 package org.mangorage.gridgame.api;
 
-import org.mangorage.gridgame.registry.Tiles;
-
 public record TilePos(int x, int y, int z) {
     public static long pack(int x, int y, int z) {
         // Pack the three integers into a single long

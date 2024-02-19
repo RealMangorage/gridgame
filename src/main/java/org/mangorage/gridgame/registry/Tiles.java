@@ -1,18 +1,24 @@
 package org.mangorage.gridgame.registry;
 
+import org.mangorage.gridgame.api.grid.ITile;
 import org.mangorage.gridgame.game.tiles.EmptyTile;
 import org.mangorage.gridgame.game.tiles.PlayerTile;
 import org.mangorage.gridgame.game.tiles.UnSolidWallTile;
 import org.mangorage.gridgame.game.tiles.WallTile;
+import org.mangorage.gridgame.registry.core.Holder;
+import org.mangorage.gridgame.registry.core.Registries;
+import org.mangorage.gridgame.registry.core.Registry;
 
 public class Tiles {
-    private static final TileRegistry REGISTRY = TileRegistry.getInstance();
+    private static final Registry<ITile> TILE_REGISTRY = Registries.TILE_REGISTRY;
 
 
-    public static final EmptyTile EMPTY_TILE = REGISTRY.register(0, new EmptyTile());
-    public static final PlayerTile PLAYER_TILE = REGISTRY.register(1, new PlayerTile());
-    public static final WallTile WALL_TILE = REGISTRY.register(2, new WallTile());
-    public static final UnSolidWallTile UN_SOLID_TILE = REGISTRY.register(3, new UnSolidWallTile());
+    public static final Holder<EmptyTile> EMPTY_TILE = TILE_REGISTRY.register("air", EmptyTile::new);
+    public static final Holder<PlayerTile> PLAYER_TILE = TILE_REGISTRY.register("player", PlayerTile::new);
+    public static final Holder<WallTile> WALL_TILE = TILE_REGISTRY.register("wall", WallTile::new);
+    public static final Holder<UnSolidWallTile> UN_SOLID_TILE = TILE_REGISTRY.register("unsolidwall", UnSolidWallTile::new);
 
-    public static void init() {}
+    public static void init() {
+    }
+
 }

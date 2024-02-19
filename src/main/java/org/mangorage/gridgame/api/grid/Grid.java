@@ -4,10 +4,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import org.mangorage.gridgame.api.TilePos;
-import org.mangorage.gridgame.registry.TileRegistry;
+import org.mangorage.gridgame.registry.Tiles;
+import org.mangorage.gridgame.registry.core.Registries;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
-import org.mangorage.gridgame.registry.Tiles;
 
 import java.awt.*;
 
@@ -72,13 +72,13 @@ public final class Grid {
                     x,
                     y,
                     z,
-                    TileRegistry.getInstance().getTile(tiles[z][x][y]),
+                    Registries.TILE_REGISTRY.getObject(tiles[z][x][y]),
                     tile_entities.get(TilePos.pack(x, y, z))
                 );
     }
 
     public GridTile setTile(int x, int y, int z, ITile tile) {
-        tiles[z][x][y] = TileRegistry.getInstance().getID(tile);
+        tiles[z][x][y] = Registries.TILE_REGISTRY.getID(tile);
         var packedPos = TilePos.pack(x, y, z);
         if (tile instanceof IEntityTile<?> entityTile) {
             var entity = entityTile.createTileEntity(this, x, y, z);
@@ -107,9 +107,9 @@ public final class Grid {
         for (int x = 0; x < this.sizeX; x++) {
             for (int y = 0; y < this.sizeY; y++) {
                 if (border && (x == 0 || y == 0 || x == sizeX - 1 || y == sizeY - 1)) {
-                    setTile(x, y, 0, Tiles.WALL_TILE);
+                    setTile(x, y, 0, Tiles.WALL_TILE.get());
                 } else {
-                    setTile(x, y, 0, Tiles.EMPTY_TILE);
+                    setTile(x, y, 0, Tiles.EMPTY_TILE.get());
                 }
             }
         }
@@ -159,7 +159,7 @@ public final class Grid {
         for (int z = 0; z < sizeZ; z++) {
             for (int x = 0; x < sizeX; x++) {
                 for (int y = 0; y < sizeY; y++) {
-                    setTile(x, y, z, TileRegistry.getInstance().getTile(data[z][x][y]));
+                    setTile(x, y, z, Registries.TILE_REGISTRY.getObject(data[z][x][y]));
                 }
             }
         }

@@ -2,11 +2,10 @@ package org.mangorage.gridgame.game;
 
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.ListTag;
-import org.mangorage.gridgame.api.SoundAPI;
+import org.mangorage.gridgame.api.sound.SoundAPI;
 import org.mangorage.gridgame.api.Util;
 import org.mangorage.gridgame.api.grid.Grid;
-import org.mangorage.gridgame.registry.TileRenderers;
+import org.mangorage.gridgame.registry.Sounds;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.render.RenderableScreen;
 
@@ -18,8 +17,6 @@ import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,8 +24,6 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
     private static final ExecutorService SAVE_EXECUTOR = Executors.newSingleThreadExecutor();
 
     public static void init() {
-        Tiles.init();
-        TileRenderers.init();
         GAME.load();
         GAME.start();
     }
@@ -54,7 +49,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
         player.setX(1);
         player.setY(1);
         player.setTile(grid);
-        grid.setTile(5, 5, 0, Tiles.UN_SOLID_TILE);
+        grid.setTile(5, 5, 0, Tiles.UN_SOLID_TILE.get());
         RenderableScreen.create();
 
     }
@@ -121,11 +116,11 @@ public class Game extends Thread implements KeyListener, MouseWheelListener {
                 case KeyEvent.VK_A -> player.moveLeft();
                 case KeyEvent.VK_D -> player.moveRight();
                 case KeyEvent.VK_SPACE -> {
-                    SoundAPI.playSound("/assets/quick.wav");
-                    grid.setTile(player.getX(), player.getY(), 0, Tiles.UN_SOLID_TILE);
+                    Sounds.LASER.get().play();
+                    grid.setTile(player.getX(), player.getY(), 0, Tiles.UN_SOLID_TILE.get());
                 }
                 case KeyEvent.VK_F1 -> SAVE_EXECUTOR.execute(this::save);
-                case KeyEvent.VK_F4 -> SoundAPI.playSound("/assets/toilet_flush.wav");
+                case KeyEvent.VK_F4 -> Sounds.TOILET_FLUSH.get().play();
                 case KeyEvent.VK_UP -> grid.updateBounds(grid.getBoundsX(), grid.getBoundsY() - 1);
                 case KeyEvent.VK_DOWN -> grid.updateBounds(grid.getBoundsX(), grid.getBoundsY() + 1);
                 case KeyEvent.VK_G -> grid.updateBounds(grid.getBoundsX() - 1, grid.getBoundsY());

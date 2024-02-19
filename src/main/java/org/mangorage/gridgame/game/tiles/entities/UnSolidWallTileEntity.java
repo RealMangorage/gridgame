@@ -26,9 +26,9 @@ public class UnSolidWallTileEntity extends TileEntity {
             if (getY() < sizeY) {
                 int newY = getY() + 1;
                 ITile tile = grid.getGridTile(getX(), newY, getZ()).getTile();
-                if (tile == Tiles.EMPTY_TILE) {
-                    grid.setTile(getX(), getY(), 0, Tiles.EMPTY_TILE);
-                    grid.setTile(getX(), newY, 0, Tiles.UN_SOLID_TILE);
+                if (tile == Tiles.EMPTY_TILE.get()) {
+                    grid.setTile(getX(), getY(), 0, Tiles.EMPTY_TILE.get());
+                    grid.setTile(getX(), newY, 0, Tiles.UN_SOLID_TILE.get());
                     var entity = grid.getGridTile(getX(), newY, getZ()).getTileEntity(this.getClass());
                     if (entity != null) {
                         entity.setSolid(solid);

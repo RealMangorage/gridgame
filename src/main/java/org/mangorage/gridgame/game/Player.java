@@ -16,8 +16,8 @@ public class Player {
     }
 
     public void updatePosition(Grid grid, int newX, int newY) {
-        grid.setTile(x, y, 1, Tiles.EMPTY_TILE);
-        grid.setTile(newX, newY, 1, Tiles.PLAYER_TILE);
+        grid.setTile(x, y, 1, Tiles.EMPTY_TILE.get());
+        grid.setTile(newX, newY, 1, Tiles.PLAYER_TILE.get());
 
         this.x = newX;
         this.y = newY;
@@ -32,11 +32,11 @@ public class Player {
     }
 
     public void setTile(Grid grid) {
-        grid.setTile(x, y, 1, Tiles.PLAYER_TILE);
+        grid.setTile(x, y, 1, Tiles.PLAYER_TILE.get());
     }
 
     public void removeTile(Grid grid) {
-        grid.setTile(x, y, 1, Tiles.EMPTY_TILE);
+        grid.setTile(x, y, 1, Tiles.EMPTY_TILE.get());
     }
 
     public void moveDown() {

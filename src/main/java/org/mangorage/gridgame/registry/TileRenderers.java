@@ -10,21 +10,21 @@ public class TileRenderers {
     static {
         var manager = RenderManager.getInstance();
         manager.register(
-                Tiles.WALL_TILE,
+                Tiles.WALL_TILE.get(),
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     graphics.setColor(Color.ORANGE);
                     graphics.fillRect((x - offsetX) * width, (y - offsetY) * height, width, height);
                 }
         );
         manager.register(
-                Tiles.PLAYER_TILE,
+                Tiles.PLAYER_TILE.get(),
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     graphics.setColor(Color.BLUE);
                     graphics.fillRect((x - offsetX) * width, (y - offsetY) * height, width, height);
                 }
         );
         manager.register(
-                Tiles.UN_SOLID_TILE,
+                Tiles.UN_SOLID_TILE.get(),
                 UnSolidWallTileEntity.class,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     var texture = tileEntity.isSolid() ? CacheAPI.getInternalImage("/assets/stone.png") : CacheAPI.getInternalImage("/assets/cobblestone.png");
