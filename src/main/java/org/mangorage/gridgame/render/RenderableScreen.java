@@ -10,7 +10,8 @@ import java.util.TimerTask;
 
 public class RenderableScreen extends JPanel {
     public static long lastUpdateMSLength = 0;
-    private static DecimalFormat df = new DecimalFormat("#.##");
+    private static final DecimalFormat df = new DecimalFormat("#.##");
+    private static final DecimalFormat formatter = new DecimalFormat("#,###");
 
     private RenderableScreen() {
         Timer timer = new Timer();
@@ -28,10 +29,18 @@ public class RenderableScreen extends JPanel {
         var expectedMS = ((double) 1 / rate) * 1000;
         var currentTPS = Math.min(rate, 1000.0 / lastMS);
 
+        var lastSave = Game.getInstance().getSaveStartTime();
+        var length = Game.getInstance().getSaveLenghth();
+        var saving = Game.getInstance().isSaving();
+
+        var ticked = Game.getInstance().getGrid().getTickedTE();
+
         graphics.setColor(Color.WHITE);
         ((Graphics2D) graphics).scale(2, 2);
         graphics.drawString("Expected %stps (%sms/t)".formatted(rate, expectedMS), 10, 10);
         graphics.drawString("Current %stps (%sms/t)".formatted(df.format(currentTPS), lastMS), 10, 20);
+        graphics.drawString("Save Status: %s (%s ms)".formatted(saving, saving ? System.currentTimeMillis() - lastSave : length), 10, 30);
+        graphics.drawString("Ticked: %s".formatted(formatter.format(ticked)), 10, 40);
     }
 
     @Override
@@ -47,7 +56,7 @@ public class RenderableScreen extends JPanel {
 
     public static void create() {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Renderable Screen");
+            JFrame frame = new JFrame("Grid Game! By MangoRage");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             RenderableScreen renderableScreen = new RenderableScreen();
             frame.add(renderableScreen);

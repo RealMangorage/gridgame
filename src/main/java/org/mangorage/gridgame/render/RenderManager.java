@@ -1,7 +1,7 @@
 package org.mangorage.gridgame.render;
 
-import org.mangorage.gridgame.api.grid.ITile;
-import org.mangorage.gridgame.api.render.IRenderer;
+import org.mangorage.gridgame.core.grid.ITile;
+import org.mangorage.gridgame.core.render.IRenderer;
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 
 import java.util.HashMap;

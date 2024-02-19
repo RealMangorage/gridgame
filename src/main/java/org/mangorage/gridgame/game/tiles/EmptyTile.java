@@ -1,7 +1,7 @@
 package org.mangorage.gridgame.game.tiles;
 
-import org.mangorage.gridgame.api.grid.Grid;
-import org.mangorage.gridgame.api.grid.ITile;
+import org.mangorage.gridgame.core.grid.Grid;
+import org.mangorage.gridgame.core.grid.ITile;
 
 
 public class EmptyTile implements ITile {

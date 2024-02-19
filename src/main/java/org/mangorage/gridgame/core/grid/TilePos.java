@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.api.grid;
+package org.mangorage.gridgame.core.grid;
 
 public record TilePos(int x, int y, int z) {
     public static long pack(int x, int y, int z) {

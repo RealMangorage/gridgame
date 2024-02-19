@@ -1,9 +1,9 @@
 package org.mangorage.gridgame.game.tiles;
 
-import org.mangorage.gridgame.api.grid.Grid;
-import org.mangorage.gridgame.api.grid.IEntityTicker;
-import org.mangorage.gridgame.api.grid.IEntityTile;
-import org.mangorage.gridgame.api.grid.ITile;
+import org.mangorage.gridgame.core.grid.Grid;
+import org.mangorage.gridgame.core.grid.IEntityTicker;
+import org.mangorage.gridgame.core.grid.IEntityTile;
+import org.mangorage.gridgame.core.grid.ITile;
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 

@@ -1,7 +1,6 @@
-package org.mangorage.gridgame.api.grid;
+package org.mangorage.gridgame.core.grid;
 
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
-import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 
 public interface IEntityTile {
     TileEntity createTileEntity(Grid grid, int x, int y, int z);

@@ -2,7 +2,7 @@ package org.mangorage.gridgame.game.tiles.entities;
 
 
 import net.querz.nbt.tag.CompoundTag;
-import org.mangorage.gridgame.api.grid.Grid;
+import org.mangorage.gridgame.core.grid.Grid;
 
 import java.util.Objects;
 

@@ -1,10 +1,10 @@
 package org.mangorage.gridgame.registry;
 
-import org.mangorage.gridgame.api.sound.ISound;
-import org.mangorage.gridgame.api.sound.Sound;
-import org.mangorage.gridgame.registry.core.Holder;
-import org.mangorage.gridgame.registry.core.Registries;
-import org.mangorage.gridgame.registry.core.Registry;
+import org.mangorage.gridgame.core.sound.ISound;
+import org.mangorage.gridgame.core.sound.Sound;
+import org.mangorage.gridgame.core.registry.Holder;
+import org.mangorage.gridgame.core.registry.Registries;
+import org.mangorage.gridgame.core.registry.Registry;
 
 public class Sounds {
     private static final Registry<ISound> SOUND_REGISTRY = Registries.SOUND_REGISTRY;

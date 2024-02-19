@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.api.grid;
+package org.mangorage.gridgame.core.grid;
 
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 

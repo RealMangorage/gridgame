@@ -1,6 +1,6 @@
-package org.mangorage.gridgame.api.sound;
+package org.mangorage.gridgame.core.sound;
 
-import org.mangorage.gridgame.api.CacheAPI;
+import org.mangorage.gridgame.core.CacheAPI;
 
 import javax.sound.sampled.AudioSystem;
 

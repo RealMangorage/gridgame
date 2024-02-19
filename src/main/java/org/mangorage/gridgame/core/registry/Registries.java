@@ -1,7 +1,7 @@
-package org.mangorage.gridgame.registry.core;
+package org.mangorage.gridgame.core.registry;
 
-import org.mangorage.gridgame.api.grid.ITile;
-import org.mangorage.gridgame.api.sound.ISound;
+import org.mangorage.gridgame.core.grid.ITile;
+import org.mangorage.gridgame.core.sound.ISound;
 
 public class Registries {
     public static final Registry<ITile> TILE_REGISTRY = Registry.create(ITile.class);

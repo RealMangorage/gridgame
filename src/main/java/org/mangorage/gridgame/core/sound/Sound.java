@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.api.sound;
+package org.mangorage.gridgame.core.sound;
 
 public record Sound(String path) implements ISound {
     @Override

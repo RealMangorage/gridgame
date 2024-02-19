@@ -4,7 +4,7 @@ import org.mangorage.gridgame.game.Game;
 import org.mangorage.gridgame.registry.Sounds;
 import org.mangorage.gridgame.registry.TileRenderers;
 import org.mangorage.gridgame.registry.Tiles;
-import org.mangorage.gridgame.registry.core.Registries;
+import org.mangorage.gridgame.core.registry.Registries;
 
 public class Start {
     public static void main(String[] args) {

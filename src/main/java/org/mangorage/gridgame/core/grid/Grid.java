@@ -1,13 +1,11 @@
-package org.mangorage.gridgame.api.grid;
+package org.mangorage.gridgame.core.grid;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import org.mangorage.gridgame.game.Player;
 import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 import org.mangorage.gridgame.registry.Tiles;
-import org.mangorage.gridgame.registry.core.Registries;
+import org.mangorage.gridgame.core.registry.Registries;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.Game;
 
@@ -18,11 +16,13 @@ import java.util.Objects;
 public final class Grid {
     // for Querying a specific x/y coordinate
     private final byte[][][] tiles;
-    private final Long2ObjectMap<TileEntity> tile_entities = new Long2ObjectOpenHashMap<>(100_000_000);
-    private final Long2ObjectMap<BoundTickableTileEntity<?>> tile_entities_tickable = new Long2ObjectOpenHashMap<>(100_000_000);
+    private final TileEntity[][][] tile_entities;
+    private final BoundTickableTileEntity<?>[][][] tile_entities_tickable;
 
     private final int sizeX, sizeY, sizeZ;
     private int boundsX, boundsY;
+
+    private int ticked = 0;
 
     public Grid(int x, int y, int z, int boundsX, int boundsY, boolean border) {
         this.sizeX = x;
@@ -31,6 +31,8 @@ public final class Grid {
         this.boundsX = boundsX;
         this.boundsY = boundsY;
         this.tiles = new byte[z][x][y];
+        this.tile_entities = new TileEntity[z][x][y];
+        this.tile_entities_tickable = new BoundTickableTileEntity[z][x][y];
         populate(border);
     }
 
@@ -39,7 +41,17 @@ public final class Grid {
     }
 
     public void tick() {
-        tile_entities_tickable.forEach((k, t) -> t.tick());
+        ticked = 0;
+        for (BoundTickableTileEntity<?>[][] boundTickableTileEntities : tile_entities_tickable) {
+            for (BoundTickableTileEntity<?>[] boundTickableTileEntity : boundTickableTileEntities) {
+                for (BoundTickableTileEntity<?> tickableTileEntity : boundTickableTileEntity) {
+                    if (tickableTileEntity != null) {
+                        tickableTileEntity.tick();
+                        ticked++;
+                    }
+                }
+            }
+        }
     }
 
     public void updateBounds(int x, int y) {
@@ -52,6 +64,10 @@ public final class Grid {
 
     public byte[][][] getGridData() {
         return tiles;
+    }
+
+    public int getTickedTE() {
+        return ticked;
     }
 
     public int getSizeX() {
@@ -87,24 +103,23 @@ public final class Grid {
                     y,
                     z,
                     Registries.TILE_REGISTRY.getObject(tiles[z][x][y]),
-                    tile_entities.get(TilePos.pack(x, y, z))
+                    tile_entities[z][x][y]
                 );
     }
 
 
     public GridTile setTile(int x, int y, int z, ITile tile) {
         tiles[z][x][y] = Registries.TILE_REGISTRY.getID(tile);
-        var packedPos = TilePos.pack(x, y, z);
 
-        tile_entities.remove(packedPos);
-        tile_entities_tickable.remove(packedPos);
+        tile_entities[z][x][y] = null;
+        tile_entities_tickable[z][x][y] = null;
 
         if (tile instanceof IEntityTile entityTile) {
             var entity = entityTile.createTileEntity(this, x, y, z);
-            tile_entities.put(packedPos, entity);
+            tile_entities[z][x][y] = entity;
             var tickable = entityTile.getTicker();
             if (tickable != null)
-                tile_entities_tickable.put(packedPos, new BoundTickableTileEntity<>(tickable, this, x, y, z, entity));
+                tile_entities_tickable[z][x][y] = new BoundTickableTileEntity<>(tickable, this, x, y, z, entity);
             return new GridTile(
                     x,
                     y,
@@ -113,7 +128,6 @@ public final class Grid {
                     entity
             );
         }
-
 
         return new GridTile(
                 x,

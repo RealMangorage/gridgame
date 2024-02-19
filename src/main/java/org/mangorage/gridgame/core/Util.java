@@ -1,9 +1,8 @@
-package org.mangorage.gridgame.api;
+package org.mangorage.gridgame.core;
 
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
-import org.mangorage.gridgame.api.grid.MousePos;
-import org.mangorage.gridgame.api.grid.TilePos;
+import org.mangorage.gridgame.core.grid.MousePos;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

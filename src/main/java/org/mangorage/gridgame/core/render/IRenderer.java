@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.api.render;
+package org.mangorage.gridgame.core.render;
 
 import java.awt.*;
 

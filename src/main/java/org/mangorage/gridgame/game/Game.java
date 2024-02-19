@@ -2,9 +2,8 @@ package org.mangorage.gridgame.game;
 
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
-import org.mangorage.gridgame.api.sound.SoundAPI;
-import org.mangorage.gridgame.api.Util;
-import org.mangorage.gridgame.api.grid.Grid;
+import org.mangorage.gridgame.core.Util;
+import org.mangorage.gridgame.core.grid.Grid;
 import org.mangorage.gridgame.registry.Sounds;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.render.RenderableScreen;
@@ -37,7 +36,7 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
         return GAME;
     }
 
-    private final Grid grid = new Grid(100, 10_000, 2, 20, 20);
+    private final Grid grid = new Grid(10_000, 10_000, 2, 20, 20);
     private final Player player = new Player();
 
     private int scale = 40;
@@ -46,7 +45,9 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
     private int ticks = 0;
     private long msPerTick = 0;
     private boolean debug = false;
-
+    private boolean saving = false;
+    private long saveStart = 0;
+    private long saveLenghth = 0;
     private GameState state = GameState.LOADING;
 
     public Game() {
@@ -84,6 +85,18 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
 
     public int getTickRate() {
         return tickRate;
+    }
+
+    public boolean isSaving() {
+        return saving;
+    }
+
+    public long getSaveStartTime() {
+        return saveStart;
+    }
+
+    public long getSaveLenghth() {
+        return saveLenghth;
     }
 
     public long getLastMSPerTick() {
@@ -148,6 +161,10 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
     }
 
     private void save() {
+        if (saving) return;
+        this.saving = true;
+        this.saveStart = System.currentTimeMillis();
+
         File gameDataCompressed = new File("gamedata.dat");
         File gameDataTilesCompressed = new File("gamedata_tiles.dat");
         if (Files.exists(gameDataTilesCompressed.toPath()))
@@ -185,6 +202,9 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
             gameData.delete();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            this.saveLenghth = System.currentTimeMillis() - saveStart;
+            this.saving = false;
         }
     }
 

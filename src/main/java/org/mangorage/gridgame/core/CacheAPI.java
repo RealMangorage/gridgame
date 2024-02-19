@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.api;
+package org.mangorage.gridgame.core;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

@@ -1,13 +1,13 @@
 package org.mangorage.gridgame.registry;
 
-import org.mangorage.gridgame.api.grid.ITile;
+import org.mangorage.gridgame.core.grid.ITile;
 import org.mangorage.gridgame.game.tiles.EmptyTile;
 import org.mangorage.gridgame.game.tiles.PlayerTile;
 import org.mangorage.gridgame.game.tiles.UnSolidWallTile;
 import org.mangorage.gridgame.game.tiles.WallTile;
-import org.mangorage.gridgame.registry.core.Holder;
-import org.mangorage.gridgame.registry.core.Registries;
-import org.mangorage.gridgame.registry.core.Registry;
+import org.mangorage.gridgame.core.registry.Holder;
+import org.mangorage.gridgame.core.registry.Registries;
+import org.mangorage.gridgame.core.registry.Registry;
 
 public class Tiles {
     private static final Registry<ITile> TILE_REGISTRY = Registries.TILE_REGISTRY;

@@ -1,9 +1,10 @@
-package org.mangorage.gridgame.registry.core;
+package org.mangorage.gridgame.core.registry;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;

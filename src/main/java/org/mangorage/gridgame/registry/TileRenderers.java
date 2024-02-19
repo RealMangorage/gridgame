@@ -1,6 +1,6 @@
 package org.mangorage.gridgame.registry;
 
-import org.mangorage.gridgame.api.CacheAPI;
+import org.mangorage.gridgame.core.CacheAPI;
 import org.mangorage.gridgame.render.RenderManager;
 import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 
