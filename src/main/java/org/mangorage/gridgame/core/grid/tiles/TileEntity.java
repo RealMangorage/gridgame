@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.game.tiles.entities;
+package org.mangorage.gridgame.core.grid.tiles;
 
 
 import net.querz.nbt.tag.CompoundTag;

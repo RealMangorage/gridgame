@@ -2,13 +2,14 @@ package org.mangorage.gridgame.game.tiles.entities;
 
 import net.querz.nbt.tag.CompoundTag;
 import org.mangorage.gridgame.core.grid.Grid;
-import org.mangorage.gridgame.core.grid.ITile;
+import org.mangorage.gridgame.core.grid.tiles.Tile;
+import org.mangorage.gridgame.core.grid.tiles.TileEntity;
 import org.mangorage.gridgame.registry.Tiles;
 
 public final class UnSolidWallTileEntity extends TileEntity {
     private int ticks = 0;
     private boolean solid = false;
-    private final boolean tick = false;
+    private static final boolean tick = false;
 
     public UnSolidWallTileEntity(Grid grid, int x, int y, int z) {
         super(grid, x, y, z);
@@ -24,7 +25,7 @@ public final class UnSolidWallTileEntity extends TileEntity {
             int sizeY = grid.getSizeY();
             if (getY() < sizeY) {
                 int newY = getY() + 1;
-                ITile tile = grid.getGridTile(getX(), newY, getZ()).getTile();
+                Tile tile = grid.getGridTile(getX(), newY, getZ()).getTile();
                 if (tile == Tiles.EMPTY_TILE.get()) {
                     grid.setTile(getX(), getY(), 0, Tiles.EMPTY_TILE.get());
                     grid.setTile(getX(), newY, 0, Tiles.UN_SOLID_TILE.get());

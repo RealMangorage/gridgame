@@ -1,12 +1,14 @@
 package org.mangorage.gridgame.core.grid;
 
-import org.mangorage.gridgame.game.tiles.entities.TileEntity;
+import org.mangorage.gridgame.core.grid.tiles.ITileEntityTicker;
+import org.mangorage.gridgame.core.grid.tiles.TileEntity;
+import org.mangorage.gridgame.core.grid.tiles.TilePos;
 
 import java.util.Objects;
 
-public record BoundTickableTileEntity<T extends TileEntity>(IEntityTicker<T> ticker, Grid grid, int x, int y, int z, T tileEntity) {
+public record BoundTickableTileEntity<T extends TileEntity>(ITileEntityTicker<T> ticker, Grid grid, TilePos pos, T tileEntity) {
     public void tick() {
-        ticker.tick(grid, x, y, z, tileEntity);
+        ticker.tick(grid, pos, tileEntity);
     }
 
     @Override
@@ -14,11 +16,11 @@ public record BoundTickableTileEntity<T extends TileEntity>(IEntityTicker<T> tic
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BoundTickableTileEntity<?> that = (BoundTickableTileEntity<?>) o;
-        return x == that.x && y == that.y && z == that.z && Objects.equals(grid, that.grid) && Objects.equals(tileEntity, that.tileEntity) && Objects.equals(ticker, that.ticker);
+        return Objects.equals(grid, that.grid) && Objects.equals(pos, that.pos) && Objects.equals(tileEntity, that.tileEntity) && Objects.equals(ticker, that.ticker);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ticker, grid, x, y, z, tileEntity);
+        return Objects.hash(pos);
     }
 }

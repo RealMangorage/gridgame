@@ -1,30 +1,30 @@
 package org.mangorage.gridgame.registry;
 
 import org.mangorage.gridgame.core.CacheAPI;
-import org.mangorage.gridgame.render.RenderManager;
+import org.mangorage.gridgame.core.render.TileRendererManager;
 import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 
 import java.awt.*;
 
 public class TileRenderers {
     static {
-        var manager = RenderManager.getInstance();
+        var manager = TileRendererManager.getInstance();
         manager.register(
-                Tiles.WALL_TILE.get(),
+                Tiles.WALL_TILE,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     graphics.setColor(Color.ORANGE);
                     graphics.fillRect((x - offsetX) * width, (y - offsetY) * height, width, height);
                 }
         );
         manager.register(
-                Tiles.PLAYER_TILE.get(),
+                Tiles.PLAYER_TILE,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     graphics.setColor(Color.BLUE);
                     graphics.fillRect((x - offsetX) * width, (y - offsetY) * height, width, height);
                 }
         );
         manager.register(
-                Tiles.UN_SOLID_TILE.get(),
+                Tiles.UN_SOLID_TILE,
                 UnSolidWallTileEntity.class,
                 (graphics, tile, tileEntity, x, y, offsetX, offsetY, width, height) -> {
                     var texture = tileEntity.isSolid() ? CacheAPI.getInternalImage("/assets/stone.png") : CacheAPI.getInternalImage("/assets/cobblestone.png");

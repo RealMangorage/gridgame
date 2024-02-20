@@ -1,4 +1,6 @@
-package org.mangorage.gridgame.core.grid;
+package org.mangorage.gridgame.core.grid.tiles;
+
+import java.util.Objects;
 
 public record TilePos(int x, int y, int z) {
     public static long pack(int x, int y, int z) {
@@ -27,5 +29,18 @@ public record TilePos(int x, int y, int z) {
         // Extract the z coordinate from the packed long
         // Perform bitwise AND operation with 0x1FFFFF to get the last 21 bits
         return (int) (packedLong & 0x1FFFFFL);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TilePos tilePos = (TilePos) o;
+        return x == tilePos.x && y == tilePos.y && z == tilePos.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 }

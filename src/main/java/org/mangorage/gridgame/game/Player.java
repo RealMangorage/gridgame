@@ -1,7 +1,7 @@
 package org.mangorage.gridgame.game;
 
 import org.mangorage.gridgame.core.grid.Grid;
-import org.mangorage.gridgame.core.grid.ITile;
+import org.mangorage.gridgame.core.grid.tiles.Tile;
 import org.mangorage.gridgame.registry.Tiles;
 
 public class Player {
@@ -43,7 +43,7 @@ public class Player {
         int newY = y + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY < grid.getSizeY()) {
-            ITile walkTo = grid.getGridTile(x, newY, 0).getTile();
+            Tile walkTo = grid.getGridTile(x, newY, 0).getTile();
             if (!walkTo.isSolid(grid, x, newY)) {
                 updatePosition(grid, x, newY);
             }
@@ -54,7 +54,7 @@ public class Player {
         int newY = y - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newY != -1) {
-            ITile walkTo = grid.getGridTile(x, newY, 0).getTile();
+            Tile walkTo = grid.getGridTile(x, newY, 0).getTile();
             if (!walkTo.isSolid(grid, x, newY)) {
                 updatePosition(grid, x, newY);
             }
@@ -65,7 +65,7 @@ public class Player {
         int newX = x - 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX != -1) {
-            ITile walkTo = grid.getGridTile(newX, y, 0).getTile();
+            Tile walkTo = grid.getGridTile(newX, y, 0).getTile();
             if (!walkTo.isSolid(grid, newX, y)) {
                 updatePosition(grid, newX, y);
             }
@@ -76,7 +76,7 @@ public class Player {
         int newX = x + 1;
         Grid grid = Game.getInstance().getGrid();
         if (newX < grid.getSizeX()) {
-            ITile walkTo = grid.getGridTile(newX, y, 0).getTile();
+            Tile walkTo = grid.getGridTile(newX, y, 0).getTile();
             if (!walkTo.isSolid(grid, newX, y)) {
                 updatePosition(grid, newX, y);
             }

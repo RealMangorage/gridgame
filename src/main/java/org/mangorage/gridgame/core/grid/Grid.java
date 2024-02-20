@@ -2,22 +2,32 @@ package org.mangorage.gridgame.core.grid;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
+import org.mangorage.gridgame.core.events.Events;
+import org.mangorage.gridgame.core.events.TileChangeEvent;
+import org.mangorage.gridgame.core.grid.tiles.GridTile;
+import org.mangorage.gridgame.core.grid.tiles.IEntityTile;
+import org.mangorage.gridgame.core.grid.tiles.Tile;
+import org.mangorage.gridgame.core.grid.tiles.TileEntity;
+import org.mangorage.gridgame.core.grid.tiles.TilePos;
 import org.mangorage.gridgame.game.Player;
-import org.mangorage.gridgame.game.tiles.entities.TileEntity;
 import org.mangorage.gridgame.registry.Tiles;
 import org.mangorage.gridgame.core.registry.Registries;
-import org.mangorage.gridgame.render.RenderManager;
+import org.mangorage.gridgame.core.render.TileRendererManager;
 import org.mangorage.gridgame.game.Game;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class Grid {
     // for Querying a specific x/y coordinate
     private final byte[][][] tiles;
     private final TileEntity[][][] tile_entities;
     private final BoundTickableTileEntity<?>[][][] tile_entities_tickable;
+
+    private final ExecutorService executor;
 
     private final int sizeX, sizeY, sizeZ;
     private int boundsX, boundsY;
@@ -33,6 +43,8 @@ public final class Grid {
         this.tiles = new byte[z][x][y];
         this.tile_entities = new TileEntity[z][x][y];
         this.tile_entities_tickable = new BoundTickableTileEntity[z][x][y];
+
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         populate(border);
     }
 
@@ -42,6 +54,7 @@ public final class Grid {
 
     public void tick() {
         ticked = 0;
+
         for (BoundTickableTileEntity<?>[][] boundTickableTileEntities : tile_entities_tickable) {
             for (BoundTickableTileEntity<?>[] boundTickableTileEntity : boundTickableTileEntities) {
                 for (BoundTickableTileEntity<?> tickableTileEntity : boundTickableTileEntity) {
@@ -52,6 +65,7 @@ public final class Grid {
                 }
             }
         }
+
     }
 
     public void updateBounds(int x, int y) {
@@ -99,40 +113,42 @@ public final class Grid {
 
     public GridTile getGridTile(int x, int y, int z) {
         return new GridTile(
-                    x,
-                    y,
-                    z,
+                    new TilePos(x, y, z),
                     Registries.TILE_REGISTRY.getObject(tiles[z][x][y]),
                     tile_entities[z][x][y]
                 );
     }
 
 
-    public GridTile setTile(int x, int y, int z, ITile tile) {
+    public GridTile setTile(int x, int y, int z, Tile tile) {
+        var event = new TileChangeEvent(this, new TilePos(x, y, z), tile);
+        Events.TILE_CHANGE_EVENT.trigger(event);
+        if (event.isCancelled()) return null;
+
+        tile = event.getTile();
+
         tiles[z][x][y] = Registries.TILE_REGISTRY.getID(tile);
 
         tile_entities[z][x][y] = null;
         tile_entities_tickable[z][x][y] = null;
+
+        var pos = new TilePos(x, y, z);
 
         if (tile instanceof IEntityTile entityTile) {
             var entity = entityTile.createTileEntity(this, x, y, z);
             tile_entities[z][x][y] = entity;
             var tickable = entityTile.getTicker();
             if (tickable != null)
-                tile_entities_tickable[z][x][y] = new BoundTickableTileEntity<>(tickable, this, x, y, z, entity);
+                tile_entities_tickable[z][x][y] = new BoundTickableTileEntity<>(tickable, this, pos, entity);
             return new GridTile(
-                    x,
-                    y,
-                    z,
+                    pos,
                     tile,
                     entity
             );
         }
 
         return new GridTile(
-                x,
-                y,
-                z,
+                new TilePos(x, y, z),
                 tile,
                 null
         );
@@ -169,7 +185,7 @@ public final class Grid {
                     var tile = GridTile.getTile();
                     var tileEntity = GridTile.getTileEntity();
 
-                    var manager = RenderManager.getInstance();
+                    var manager = TileRendererManager.getInstance();
                     var renderer = manager.getRenderer(tile);
                     if (renderer == null) continue;
                     renderer.render(

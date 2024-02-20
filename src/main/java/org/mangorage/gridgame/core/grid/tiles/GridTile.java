@@ -1,22 +1,20 @@
-package org.mangorage.gridgame.core.grid;
+package org.mangorage.gridgame.core.grid.tiles;
 
-import org.mangorage.gridgame.game.tiles.entities.TileEntity;
-
-public record GridTile(int x, int y, int z, ITile tile, TileEntity tileEntity) {
+public record GridTile(TilePos tilePos, Tile tile, TileEntity tileEntity) {
 
     public int getX() {
-        return x;
+        return tilePos.x();
     }
 
     public int getY() {
-        return y;
+        return tilePos.y();
     }
 
     public int getZ() {
-        return z;
+        return tilePos.z();
     }
 
-    public ITile getTile() {
+    public Tile getTile() {
         return tile;
     }
 

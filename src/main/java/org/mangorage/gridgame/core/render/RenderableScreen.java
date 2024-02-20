@@ -1,4 +1,4 @@
-package org.mangorage.gridgame.render;
+package org.mangorage.gridgame.core.render;
 
 import org.mangorage.gridgame.game.Game;
 
@@ -34,6 +34,7 @@ public class RenderableScreen extends JPanel {
         var saving = Game.getInstance().isSaving();
 
         var ticked = Game.getInstance().getGrid().getTickedTE();
+        var player = Game.getInstance().getPlayer();
 
         graphics.setColor(Color.WHITE);
         ((Graphics2D) graphics).scale(2, 2);
@@ -41,6 +42,7 @@ public class RenderableScreen extends JPanel {
         graphics.drawString("Current %stps (%sms/t)".formatted(df.format(currentTPS), lastMS), 10, 20);
         graphics.drawString("Save Status: %s (%s ms)".formatted(saving, saving ? System.currentTimeMillis() - lastSave : length), 10, 30);
         graphics.drawString("Ticked: %s".formatted(formatter.format(ticked)), 10, 40);
+        graphics.drawString("Player Position x: %s y: %s".formatted(player.getX(), player.getY()), 10, 50);
     }
 
     @Override

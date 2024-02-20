@@ -6,7 +6,7 @@ import org.mangorage.gridgame.core.Util;
 import org.mangorage.gridgame.core.grid.Grid;
 import org.mangorage.gridgame.registry.Sounds;
 import org.mangorage.gridgame.registry.Tiles;
-import org.mangorage.gridgame.render.RenderableScreen;
+import org.mangorage.gridgame.core.render.RenderableScreen;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -62,8 +62,12 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
     public void run() {
         while (running) {
             try {
-                Thread.sleep((int) (((double) 1 / tickRate) * 1000));
+                long start = System.currentTimeMillis();
+                long sleep = ((int) (((double) 1 / tickRate) * 1000) - msPerTick);
+                if (sleep > 0)
+                    Thread.sleep(sleep);
                 tick();
+                msPerTick = System.currentTimeMillis() - start;
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -71,12 +75,10 @@ public class Game extends Thread implements KeyListener, MouseWheelListener, Mou
     }
 
     public void tick() {
-        long start = System.currentTimeMillis();
         if (state == GameState.READY) {
             ticks++;
             grid.tick();
         }
-        msPerTick = System.currentTimeMillis() - start;
     }
 
     public int getTicks() {

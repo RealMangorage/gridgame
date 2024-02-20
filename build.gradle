@@ -19,9 +19,6 @@ repositories {
     maven {
         url = 'https://jitpack.io/'
     }
-    maven {
-        url = 'https://repo.glowstone.net/content/repositories/snapshots'
-    }
 }
 
 dependencies {
@@ -32,6 +29,8 @@ dependencies {
     implementation 'fastutil:fastutil:5.0.9'
     implementation 'org.apache.commons:commons-compress:+'
     implementation 'org.tukaani:xz:1.8'
+    implementation 'com.github.Fylipp:easy-events:1.+'
+    implementation 'org.reflections:reflections:0.9.12'
 }
 
 test {
@@ -41,14 +40,14 @@ test {
 jar {
     manifest {
         attributes(
-            'Main-Class' : 'org.mangorage.gridgame.Start'
+            'Main-Class' : 'org.mangorage.gridgame.core.classloading.Init'
         )
     }
 }
 
 task runGame(type: JavaExec) {
     // Set the main class to run
-    main = 'org.mangorage.gridgame.Start'
+    main = 'org.mangorage.gridgame.core.classloading.Init'
     classpath = sourceSets.main.runtimeClasspath
 
     setWorkingDir("build/run")

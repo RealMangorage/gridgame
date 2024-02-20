@@ -1,14 +1,14 @@
 package org.mangorage.gridgame.game.tiles;
 
 import org.mangorage.gridgame.core.grid.Grid;
-import org.mangorage.gridgame.core.grid.IEntityTicker;
-import org.mangorage.gridgame.core.grid.IEntityTile;
-import org.mangorage.gridgame.core.grid.ITile;
-import org.mangorage.gridgame.game.tiles.entities.TileEntity;
+import org.mangorage.gridgame.core.grid.tiles.ITileEntityTicker;
+import org.mangorage.gridgame.core.grid.tiles.IEntityTile;
+import org.mangorage.gridgame.core.grid.tiles.Tile;
+import org.mangorage.gridgame.core.grid.tiles.TileEntity;
 import org.mangorage.gridgame.game.tiles.entities.UnSolidWallTileEntity;
 
 
-public class UnSolidWallTile implements ITile, IEntityTile {
+public class UnSolidWallTile extends Tile implements IEntityTile {
 
     @Override
     public boolean isSolid(Grid grid, int x, int y) {
@@ -24,8 +24,9 @@ public class UnSolidWallTile implements ITile, IEntityTile {
         return new UnSolidWallTileEntity(grid, x, y, z);
     }
 
+
     @Override
-    public <T extends TileEntity> IEntityTicker<T> getTicker() {
-        return (grid, x, y, z, tileEntity) -> ((UnSolidWallTileEntity) tileEntity).tick();
+    public <T extends TileEntity> ITileEntityTicker<T> getTicker() {
+        return (grid, pos, tileEntity) -> ((UnSolidWallTileEntity) tileEntity).tick();
     }
 }

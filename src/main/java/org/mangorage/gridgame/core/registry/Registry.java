@@ -10,15 +10,16 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class Registry<T> {
-    public static <T> Registry<T> create(Class<T> registryObjectClass) {
-        return new Registry<>(registryObjectClass);
+    public static <T> Registry<T> create(String ID) {
+        return new Registry<>(ID);
     }
 
     private static final class HolderImpl<T, X extends T> implements Holder<X> {
+        private String ID;
         private final Supplier<X> supplier;
         private X object;
 
-        private HolderImpl(Supplier<X> supplier) {
+        private HolderImpl(String ID, Supplier<X> supplier) {
             this.supplier = supplier;
         }
 
@@ -31,9 +32,14 @@ public class Registry<T> {
         public X get() {
             return object;
         }
+
+        @Override
+        public String getID() {
+            return ID;
+        }
     }
 
-    private final Class<T> tClass;
+    private final String registryID;
     private final Map<String, Holder<? extends T>> holdersMap = new LinkedHashMap<>();
     private boolean frozen = false;
 
@@ -43,14 +49,14 @@ public class Registry<T> {
 
 
 
-    private Registry(Class<T> tClass) {
-        this.tClass = tClass;
+    private Registry( String registryID) {
+        this.registryID = registryID;
     }
 
     public <X extends T> Holder<X> register(String id, Supplier<X> supplier) {
         if (frozen) throw new IllegalStateException("Registry is frozen.");
-        if (holdersMap.containsKey(id)) throw new IllegalStateException("Already registered %s to registry of %s type".formatted(id, tClass));
-        HolderImpl<T, X> holder = new HolderImpl<>(supplier);
+        if (holdersMap.containsKey(id)) throw new IllegalStateException("Already registered %s to registry of %s type".formatted(id, registryID));
+        HolderImpl<T, X> holder = new HolderImpl<>(id, supplier);
         holdersMap.put(id, holder);
         return holder;
     }
