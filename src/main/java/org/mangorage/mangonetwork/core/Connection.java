@@ -23,13 +23,11 @@ public final class Connection {
     @SuppressWarnings("all")
     public <T extends IPacket> void send(T packet) {
         PacketHandler<IPacket> iPacket = (PacketHandler<IPacket>) PacketHandler.get(packet.getClass());
-        Scheduler.RUNNER.execute(() -> {
-            iPacket.send(
-                    packet,
-                    packetSender,
-                    address,
-                    channelSupplier.get()
-            );
-        });
+        iPacket.send(
+                packet,
+                packetSender,
+                address,
+                channelSupplier.get()
+        );
     }
 }

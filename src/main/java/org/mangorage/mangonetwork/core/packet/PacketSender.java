@@ -1,10 +1,10 @@
 package org.mangorage.mangonetwork.core.packet;
 
+import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
 
 import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public final class PacketSender {
     private final LinkedList<Packet> queuedPackets = new LinkedList<>();
@@ -12,12 +12,8 @@ public final class PacketSender {
 
     public PacketSender(Side side) {
         this.side = side;
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                PacketSender.this.sendNextPacket();
-            }
-        }, 0, 20);
+        Scheduler.RUNNER.scheduleAtFixedRate(PacketSender.this::sendNextPacket, 0, 20, TimeUnit.MILLISECONDS);
+
     }
 
     public Side getSide() {
