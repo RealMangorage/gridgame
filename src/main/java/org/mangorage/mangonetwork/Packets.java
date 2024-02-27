@@ -1,5 +1,6 @@
 package org.mangorage.mangonetwork;
 
+import org.mangorage.gridgame.common.packets.GridGamePackets;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.packets.MessagePacket;
 
@@ -15,5 +16,6 @@ public class Packets {
     );
 
     public static void init() {
+        GridGamePackets.init();
     }
 }

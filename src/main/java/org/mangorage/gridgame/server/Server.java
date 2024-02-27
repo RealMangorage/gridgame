@@ -9,12 +9,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import org.mangorage.gridgame.common.packets.TileUpdatePacket;
+import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.mangonetwork.Packets;
 import org.mangorage.mangonetwork.core.Connection;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.packet.PacketSender;
 import org.mangorage.mangonetwork.packets.MessagePacket;
 
 public class Server extends Thread {
@@ -27,10 +30,13 @@ public class Server extends Thread {
     }
 
     private final int port;
+    private final PacketSender packetSender = new PacketSender(Side.SERVER);
 
     private Server(int port) {
         System.out.println("Starting Server Version 1.0");
         this.port = port;
+
+        GridGameServer.init();
     }
 
     @Override
@@ -58,10 +64,10 @@ public class Server extends Thread {
                                             System.out.printf("From Side: %s%n", response.sentFrom());
                                             System.out.printf("Source: %s%n", response.source());
 
-                                            Connection connection = new Connection(() -> ch, response.source(), Side.SERVER);
+                                            Connection connection = new Connection(() -> ch, response.source(), packetSender);
+                                            connection.send(new MessagePacket("LOL FROM SERVER!"));
 
-                                            connection.send(new MessagePacket("TEST WAHAT?"));
-
+                                            GridGameServer.getInstance().addPlayer(connection);
                                         });
                                     }
                                 }

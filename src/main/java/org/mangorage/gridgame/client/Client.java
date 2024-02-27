@@ -14,6 +14,7 @@ import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.packet.PacketSender;
 import org.mangorage.mangonetwork.packets.MessagePacket;
 
 import java.net.InetSocketAddress;
@@ -32,6 +33,8 @@ public class Client {
 
     private final InetSocketAddress server;
     private final AtomicReference<Channel> channel = new AtomicReference<>();
+
+    private final PacketSender packetSender = new PacketSender(Side.CLIENT);
     private final Connection connection;
 
 
@@ -40,7 +43,9 @@ public class Client {
         String[] ipArr = IP.split(":");
 
         this.server = new InetSocketAddress(ipArr[0], Integer.parseInt(ipArr[1]));
-        this.connection = new Connection(channel::get, server, Side.CLIENT);
+        this.connection = new Connection(channel::get, server, packetSender);
+
+        GridGameClient.init(connection);
 
         CompletableFuture.runAsync(() -> {
             EventLoopGroup group = new NioEventLoopGroup();
@@ -77,8 +82,7 @@ public class Client {
 
                                 Client.this.channel.set(ch);
 
-                                connection.send(new MessagePacket("WOOP?"));
-
+                                connection.send(new MessagePacket("LOL"));
 
                                 System.out.println("Client Started...");
                             }
