@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.tukaani:xz:1.8'
     implementation 'com.github.Fylipp:easy-events:1.+'
     implementation 'org.reflections:reflections:0.9.12'
+    implementation 'io.netty:netty-all:4.1.68.Final'
 }
 
 test {
