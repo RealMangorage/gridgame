@@ -9,6 +9,7 @@ import org.mangorage.gridgame.server.world.ServerLevel;
 import org.mangorage.mangonetwork.core.Connection;
 import org.mangorage.mangonetwork.core.Scheduler;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,11 +37,18 @@ public class GridGameServer {
         PLAYERS.add(connection);
 
         connection.send(new WorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()));
+    }
 
-        Scheduler.RUNNER.schedule(() -> serverLevel.setTile(new TilePos(2, 2, 0), TileRegistry.SOLD_TILE.get(), 1), 2, TimeUnit.SECONDS);
+    public ServerLevel getLevel() {
+        return serverLevel;
     }
 
     public List<Connection> getPlayers() {
         return PLAYERS;
+    }
+
+    public Connection getPlayer(InetSocketAddress address) {
+        var optional = getPlayers().stream().filter(c -> c.getAddress().equals(address)).findAny();
+        return optional.isPresent() ? optional.get() : null;
     }
 }

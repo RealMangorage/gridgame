@@ -7,24 +7,20 @@ import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.Tile;
 import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
-import org.mangorage.mangonetwork.core.Connection;
 import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
 
 import java.awt.*;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class ClientLevel extends Level {
-    private final Connection connection;
     private byte[][][] tiles;
     private int sizeX, sizeY, sizeZ;
 
     private final Long2ObjectArrayMap<TileEntity> TILE_ENTITYS = new Long2ObjectArrayMap<>();
 
 
-    public ClientLevel(Connection connection) {
-        this.connection = connection;
+    public ClientLevel() {
         Scheduler.RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
     }
 
@@ -35,6 +31,11 @@ public class ClientLevel extends Level {
             this.sizeY = y;
             this.sizeZ = z;
         }
+    }
+
+    @Override
+    public Tile getTile(TilePos pos) {
+        return Registries.TILE_REGISTRY.getObject(tiles[pos.z()][pos.x()][pos.y()]);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class ClientLevel extends Level {
 
     @Override
     public void setTile(TilePos pos, Tile tile, int flag) {
+        if (tiles == null) return;
         if (flag == 2) {
             tiles[pos.z()][pos.x()][pos.y()] = Registries.TILE_REGISTRY.getID(tile);
 

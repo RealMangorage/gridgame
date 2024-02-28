@@ -21,6 +21,14 @@ public class GridGamePackets {
             TileUpdatePacket::handle
     );
 
+    public static final PacketHandler<PlayerMovePacket> PLAYER_MOVE_PACKET = PacketHandler.create(
+            PlayerMovePacket.class,
+            ID++,
+            PlayerMovePacket::encode,
+            PlayerMovePacket::new,
+            PlayerMovePacket::handle
+    );
+
     public static void init() {
     }
 }

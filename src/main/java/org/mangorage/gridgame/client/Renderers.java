@@ -16,6 +16,14 @@ public class Renderers {
                     graphics.fillRect(x * 16, y * 16, 16, 16);
                 }
         );
+
+        MANAGER.register(
+                TileRegistry.PLAYER_TILE,
+                (graphics, tile, entity, x, y, oX, oY, w, h) -> {
+                    graphics.setColor(Color.RED);
+                    graphics.fillRect(x * 16, y * 16, 16, 16);
+                }
+        );
     }
 
     public static void init() {

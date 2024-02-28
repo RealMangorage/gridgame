@@ -4,6 +4,7 @@ import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.client.screen.RenderableScreen;
 import org.mangorage.gridgame.common.BootStrap;
 import org.mangorage.gridgame.common.Events;
+import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.gridgame.server.GridGameServer;
 import org.mangorage.mangonetwork.core.Connection;
 
@@ -33,10 +34,12 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
     private final TileRendererManager renderManager = new TileRendererManager();
     private final Connection connection;
     private final ClientLevel clientLevel;
+    private final Player player;
 
     private GridGameClient(Connection connection) {
         this.connection = connection;
-        this.clientLevel = new ClientLevel(connection);
+        this.clientLevel = new ClientLevel();
+        this.player = new Player(clientLevel);
         RenderableScreen.create();
 
         Events.RENDER_EVENT.addListener(e -> {
@@ -48,6 +51,10 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
         return renderManager;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -55,7 +62,9 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode() == KeyEvent.VK_D) {
+            player.moveRight();
+        }
     }
 
     @Override
@@ -95,5 +104,9 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
 
     public ClientLevel getLevel() {
         return clientLevel;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }

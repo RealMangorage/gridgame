@@ -64,10 +64,12 @@ public class Server extends Thread {
                                             System.out.printf("From Side: %s%n", response.sentFrom());
                                             System.out.printf("Source: %s%n", response.source());
 
-                                            Connection connection = new Connection(() -> ch, response.source(), packetSender);
-                                            connection.send(new MessagePacket("LOL FROM SERVER!"));
+                                            if (GridGameServer.getInstance().getPlayer(response.source()) == null) {
+                                                Connection connection = new Connection(() -> ch, response.source(), packetSender);
+                                                connection.send(new MessagePacket("LOL FROM SERVER!"));
 
-                                            GridGameServer.getInstance().addPlayer(connection);
+                                                GridGameServer.getInstance().addPlayer(connection);
+                                            }
                                         });
                                     }
                                 }

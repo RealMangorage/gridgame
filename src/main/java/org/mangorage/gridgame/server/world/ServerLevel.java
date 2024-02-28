@@ -52,9 +52,13 @@ public class ServerLevel extends Level {
             TILE_ENTITYS.put(packedPos, TE);
 
         GridGameServer.getInstance().getPlayers().forEach(plr -> {
-            System.out.println("SENT PACKET CHANGE");
             plr.send(new TileUpdatePacket(pos, id));
         });
+    }
+
+    @Override
+    public Tile getTile(TilePos pos) {
+        return Registries.TILE_REGISTRY.getObject(tiles[pos.z()][pos.x()][pos.y()]);
     }
 
     @Override

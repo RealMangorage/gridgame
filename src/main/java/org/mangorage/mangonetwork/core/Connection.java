@@ -19,6 +19,9 @@ public final class Connection {
         this.address = address;
     }
 
+    public InetSocketAddress getAddress() {
+        return address;
+    }
 
     @SuppressWarnings("all")
     public <T extends IPacket> void send(T packet) {
