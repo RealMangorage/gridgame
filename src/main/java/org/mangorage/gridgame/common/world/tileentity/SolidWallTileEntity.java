@@ -8,14 +8,14 @@ import org.mangorage.mangonetwork.core.Side;
 
 public class SolidWallTileEntity extends TileEntity {
     private int ticks = 0;
-
+    private boolean doTick = false;
     public SolidWallTileEntity(Level level, TilePos pos, Side side) {
         super(level, pos, side);
     }
 
     @Override
     public void tick() {
-        if (getSide() == Side.SERVER) {
+        if (getSide() == Side.SERVER && doTick) {
             ticks++;
             var maxY = getLevel().getSizeY();
             var pos = getPos();

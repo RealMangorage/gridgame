@@ -9,7 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.mangorage.mangonetwork.Packets;
-import org.mangorage.mangonetwork.core.Connection;
+import org.mangorage.mangonetwork.core.connection.Connection;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
@@ -18,17 +18,15 @@ import org.mangorage.mangonetwork.core.packet.PacketSender;
 import org.mangorage.mangonetwork.packets.MessagePacket;
 
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
-    private static Client instance;
 
-    public static void main(String[] args) throws SocketException {
+    public static void main(String[] args) {
         Packets.init();
         // 23.26.60.28:14126
-        instance = new Client("localhost:25565");
+        new Client("localhost:25565");
     }
 
     private final InetSocketAddress server;
@@ -81,8 +79,6 @@ public class Client {
                                 });
 
                                 Client.this.channel.set(ch);
-
-                                connection.send(new MessagePacket("LOL"));
 
                                 System.out.println("Client Started...");
                             }

@@ -51,9 +51,7 @@ public class ServerLevel extends Level {
         if (TE != null)
             TILE_ENTITYS.put(packedPos, TE);
 
-        GridGameServer.getInstance().getPlayers().forEach(plr -> {
-            plr.send(new TileUpdatePacket(pos, id));
-        });
+        GridGameServer.getInstance().getPipedConnection().send(new TileUpdatePacket(pos, id));
     }
 
     @Override

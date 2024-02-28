@@ -1,7 +1,5 @@
-package org.mangorage.gridgame.common.world.entities;
+package org.mangorage.gridgame.client;
 
-import org.mangorage.gridgame.client.ClientLevel;
-import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.gridgame.common.packets.PlayerMovePacket;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.TilePos;

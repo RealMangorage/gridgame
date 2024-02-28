@@ -1,27 +1,27 @@
 package org.mangorage.gridgame.server;
 
+import io.netty.channel.Channel;
 import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.gridgame.common.BootStrap;
 import org.mangorage.gridgame.common.packets.WorldLoadPacket;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.server.world.ServerLevel;
-import org.mangorage.mangonetwork.core.Connection;
-import org.mangorage.mangonetwork.core.Scheduler;
+import org.mangorage.mangonetwork.core.connection.IPipedConnection;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class GridGameServer {
     private static GridGameServer INSTANCE;
 
-    public static void init() {
+    public static void init(IPipedConnection pipedConnection) {
         if (GridGameClient.getInstance() != null)
             throw new IllegalStateException("Cannot start Server... Client already started");
 
-        INSTANCE = new GridGameServer();
+        if (INSTANCE != null) return;
+
+        INSTANCE = new GridGameServer(pipedConnection);
 
         BootStrap.init(true);
     }
@@ -30,25 +30,26 @@ public class GridGameServer {
         return INSTANCE;
     }
 
-    private final List<Connection> PLAYERS = new ArrayList<>();
     private final ServerLevel serverLevel = new ServerLevel(10, 10, 2);
+    private final IPipedConnection pipedConnection;
 
-    public void addPlayer(Connection connection) {
-        PLAYERS.add(connection);
+    private GridGameServer(IPipedConnection connection) {
+        this.pipedConnection = connection;
+    }
 
-        connection.send(new WorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()));
+
+    public void addPlayer(InetSocketAddress address, Supplier<Channel> channelSupplier) {
+        if (!pipedConnection.join(address, channelSupplier)) {
+            pipedConnection.send(new WorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()), address);
+            serverLevel.setTile(new TilePos(0, 0, 0), TileRegistry.SOLD_TILE.get(), 2);
+        }
     }
 
     public ServerLevel getLevel() {
         return serverLevel;
     }
 
-    public List<Connection> getPlayers() {
-        return PLAYERS;
-    }
-
-    public Connection getPlayer(InetSocketAddress address) {
-        var optional = getPlayers().stream().filter(c -> c.getAddress().equals(address)).findAny();
-        return optional.isPresent() ? optional.get() : null;
+    public IPipedConnection getPipedConnection() {
+        return pipedConnection;
     }
 }

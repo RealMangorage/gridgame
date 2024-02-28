@@ -4,9 +4,8 @@ import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.client.screen.RenderableScreen;
 import org.mangorage.gridgame.common.BootStrap;
 import org.mangorage.gridgame.common.Events;
-import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.gridgame.server.GridGameServer;
-import org.mangorage.mangonetwork.core.Connection;
+import org.mangorage.mangonetwork.core.connection.Connection;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -21,6 +20,8 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
     public static void init(Connection connection) {
         if (GridGameServer.getInstance() != null)
             throw new IllegalStateException("Cant start Client... Already started server...");
+
+        if (INSTANCE != null) return;
 
         INSTANCE = new GridGameClient(connection);
 
