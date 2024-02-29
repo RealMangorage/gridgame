@@ -21,13 +21,22 @@ public class GridGamePackets {
             TileUpdatePacket::handle
     );
 
-    public static final PacketHandler<PlayerMovePacket> PLAYER_MOVE_PACKET = PacketHandler.create(
-            PlayerMovePacket.class,
+    public static final PacketHandler<C2SPlayerMovePacket> PLAYER_MOVE_PACKET_C2S = PacketHandler.create(
+            C2SPlayerMovePacket.class,
             ID++,
-            PlayerMovePacket::encode,
-            PlayerMovePacket::new,
-            PlayerMovePacket::handle
+            C2SPlayerMovePacket::encode,
+            C2SPlayerMovePacket::new,
+            C2SPlayerMovePacket::handle
     );
+
+    public static final PacketHandler<S2CPlayerMovePacket> PLAYER_MOVE_PACKET_S2C = PacketHandler.create(
+            S2CPlayerMovePacket.class,
+            ID++,
+            S2CPlayerMovePacket::encode,
+            S2CPlayerMovePacket::new,
+            S2CPlayerMovePacket::handle
+    );
+
 
     public static void init() {
     }

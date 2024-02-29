@@ -41,6 +41,13 @@ public class ServerLevel extends Level {
     }
 
     @Override
+    public boolean isValid(TilePos pos) {
+        if (pos.x() < 0 || pos.x() > getSizeX() - 1) return false;
+        if (pos.y() < 0 || pos.y() > getSizeY() - 1) return false;
+        return true;
+    }
+
+    @Override
     public void setTile(TilePos pos, Tile tile, int flag) {
         var id = Registries.TILE_REGISTRY.getID(tile);
         this.tiles[pos.z()][pos.x()][pos.z()] = id;

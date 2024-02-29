@@ -18,6 +18,8 @@ import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.packet.PacketSender;
 
+import java.util.concurrent.TimeUnit;
+
 public class Server extends Thread {
     private static Server instance;
 
@@ -56,7 +58,7 @@ public class Server extends Thread {
                                 protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
                                     PacketResponse<?> response = PacketHandler.receivePacket(packet);
                                     if (response != null) {
-                                        Scheduler.RUNNER.execute(() -> {
+                                        Scheduler.RUNNER.schedule(() -> {
                                             PacketHandler.handle(response.packet(), response.packetId(), response.source(), response.sentFrom());
 
                                             System.out.printf("Received Packet: %s%n", response.packetName());
@@ -64,7 +66,7 @@ public class Server extends Thread {
                                             System.out.printf("Source: %s%n", response.source());
 
                                             GridGameServer.getInstance().addPlayer(response.source(), () -> ch);
-                                        });
+                                        }, 10, TimeUnit.MILLISECONDS);
                                     }
                                 }
                             });

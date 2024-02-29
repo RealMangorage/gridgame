@@ -9,5 +9,5 @@ import java.util.function.Supplier;
 
 public interface IPipedConnection extends IConnection {
     <T extends IPacket> void send(T packet, InetSocketAddress sendTo);
-    boolean join(InetSocketAddress address, Supplier<Channel>channelSupplier);
+    Connection join(InetSocketAddress address, Supplier<Channel>channelSupplier);
 }

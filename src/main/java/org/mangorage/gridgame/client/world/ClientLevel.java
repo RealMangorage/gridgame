@@ -1,6 +1,7 @@
-package org.mangorage.gridgame.client;
+package org.mangorage.gridgame.client.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.common.Registries;
 import org.mangorage.gridgame.common.world.Level;
@@ -51,6 +52,11 @@ public class ClientLevel extends Level {
     @Override
     public int getSizeZ() {
         return sizeZ;
+    }
+
+    @Override
+    public boolean isValid(TilePos pos) {
+        return false;
     }
 
     @Override

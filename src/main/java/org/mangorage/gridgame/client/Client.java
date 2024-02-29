@@ -15,7 +15,6 @@ import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.packet.PacketSender;
-import org.mangorage.mangonetwork.packets.MessagePacket;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -25,8 +24,12 @@ public class Client {
 
     public static void main(String[] args) {
         Packets.init();
-        // 23.26.60.28:14126
-        new Client("localhost:25565");
+        if (args.length == 0) {
+            // 23.26.60.28:14126
+            new Client("localhost:25565");
+        } else {
+            new Client(args[0] + ":25565");
+        }
     }
 
     private final InetSocketAddress server;

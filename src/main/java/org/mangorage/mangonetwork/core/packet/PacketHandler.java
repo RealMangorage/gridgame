@@ -6,7 +6,6 @@ import io.netty.channel.socket.DatagramPacket;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
@@ -22,7 +21,7 @@ public class PacketHandler<T> {
     private static final IHandler<EmptyPacket> EMPTY_HANDLER = (packet, origin, side) -> {};
 
 
-    public static PacketResponse<?> receivePacket(DatagramPacket datagramPacket) throws IOException {
+    public static PacketResponse<?> receivePacket(DatagramPacket datagramPacket) {
         SimpleByteBuf headerBuffer = new SimpleByteBuf(datagramPacket.content());
         int totalSize = headerBuffer.readableBytes();
         int packetId = headerBuffer.readInt();
@@ -39,19 +38,28 @@ public class PacketHandler<T> {
         var handler = PACKETS.get(packetId);
         System.out.println("Packet ID %s from %s received with size: %s bytes".formatted(packetId, datagramPacket.sender(), totalSize));
 
-        return new PacketResponse<>(
-                handler.getDecoder().apply(packetBuffer),
-                handler.getNameID(),
-                packetId,
-                from,
-                datagramPacket.sender()
-        );
+        try {
+            return new PacketResponse<>(
+                    handler.getDecoder().apply(packetBuffer),
+                    handler.getNameID(),
+                    packetId,
+                    from,
+                    datagramPacket.sender()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static <T> void handle(T packet, int packetId, InetSocketAddress origin, Side side) {
-        if (PACKETS.containsKey(packetId)) {
-            ((PacketHandler<T>) PACKETS.get(packetId)).getHandler().handle(packet, origin, side);
+        try {
+            if (PACKETS.containsKey(packetId)) {
+                ((PacketHandler<T>) PACKETS.get(packetId)).getHandler().handle(packet, origin, side);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -106,7 +114,7 @@ public class PacketHandler<T> {
         encoder.accept(packet, packetBuffer);
 
         headerBuffer.writeInt(ID); // ID
-        headerBuffer.writeEnum(sender.getSide()); // Side
+        headerBuffer.writeEnum(sender.getSenderSide()); // Side
         headerBuffer.writeByteArray(packetBuffer.array());
 
         byte[] data = headerBuffer.array();
@@ -115,8 +123,14 @@ public class PacketHandler<T> {
             return;
         }
 
-        DatagramPacket datagramPacket = new DatagramPacket(headerBuffer, sendTo);
-        sender.send(new Packet(datagramPacket, getNameID(), channel));
+        try {
+            DatagramPacket datagramPacket = new DatagramPacket(headerBuffer, sendTo);
+            channel.writeAndFlush(datagramPacket).sync();
+
+            System.out.println("Sent Packet %s to %s with size of %s bytes".formatted(packet.getClass().getName(), sender.getSenderSide().getOpposite(), datagramPacket.content().readableBytes()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Function<SimpleByteBuf, T> getDecoder() {

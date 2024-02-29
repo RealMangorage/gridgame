@@ -41,14 +41,14 @@ test {
 jar {
     manifest {
         attributes(
-            'Main-Class' : 'org.mangorage.gridgame.core.classloading.Init'
+            'Main-Class' : 'org.mangorage.gridgame.client.PublicClientMain'
         )
     }
 }
 
 task runGame(type: JavaExec) {
     // Set the main class to run
-    main = 'org.mangorage.gridgame.core.classloading.Init'
+    main = 'org.mangorage.gridgame.client.PublicClientMain'
     classpath = sourceSets.main.runtimeClasspath
 
     setWorkingDir("build/run")

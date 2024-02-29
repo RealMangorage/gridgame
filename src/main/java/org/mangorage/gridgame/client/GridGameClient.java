@@ -2,8 +2,12 @@ package org.mangorage.gridgame.client;
 
 import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.client.screen.RenderableScreen;
+import org.mangorage.gridgame.client.world.ClientLevel;
+import org.mangorage.gridgame.client.world.entities.LocalPlayer;
 import org.mangorage.gridgame.common.BootStrap;
 import org.mangorage.gridgame.common.Events;
+import org.mangorage.gridgame.common.core.Direction;
+import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.gridgame.server.GridGameServer;
 import org.mangorage.mangonetwork.core.connection.Connection;
 
@@ -40,7 +44,7 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
     private GridGameClient(Connection connection) {
         this.connection = connection;
         this.clientLevel = new ClientLevel();
-        this.player = new Player(clientLevel);
+        this.player = new LocalPlayer(clientLevel);
         RenderableScreen.create();
 
         Events.RENDER_EVENT.addListener(e -> {
@@ -63,8 +67,11 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_D) {
-            player.moveRight();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W -> player.move(Direction.UP);
+            case KeyEvent.VK_S -> player.move(Direction.DOWN);
+            case KeyEvent.VK_A -> player.move(Direction.LEFT);
+            case KeyEvent.VK_D -> player.move(Direction.RIGHT);
         }
     }
 
