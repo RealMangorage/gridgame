@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class PacketHandler<T> {
+public class PacketHandler<T extends IPacket> {
     private static final int PACKET_SIZE = 65536;
     private static final HashMap<Integer, PacketHandler<?>> PACKETS = new HashMap<>();
     private static final HashMap<Class<?>, PacketHandler<?>> PACKETS_REVERSE = new HashMap<>();
@@ -53,7 +53,7 @@ public class PacketHandler<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> void handle(T packet, int packetId, InetSocketAddress origin, Side side) {
+    public static <T extends IPacket> void handle(T packet, int packetId, InetSocketAddress origin, Side side) {
         try {
             if (PACKETS.containsKey(packetId)) {
                 ((PacketHandler<T>) PACKETS.get(packetId)).getHandler().handle(packet, origin, side);
@@ -63,7 +63,17 @@ public class PacketHandler<T> {
         }
     }
 
-    public static <T> PacketHandler<T> create(Class<T> type, int ID, BiConsumer<T, SimpleByteBuf> encoder, Function<SimpleByteBuf, T> decoder, IHandler<T> handler) {
+    public static <T extends IPacket> PacketHandler<T> create(Class<T> type, int ID) {
+        return create(
+                type,
+                ID,
+                IPacket::encode,
+                IPacket.create(type),
+                IPacket::handle
+        );
+    }
+
+    public static <T extends IPacket> PacketHandler<T> create(Class<T> type, int ID, BiConsumer<T, SimpleByteBuf> encoder, Function<SimpleByteBuf, T> decoder, IHandler<T> handler) {
         return create(type, type.getName(), ID, encoder, decoder, handler);
     }
 
@@ -75,7 +85,7 @@ public class PacketHandler<T> {
         return create(EmptyPacket.class, nameID, ID, EMPTY_ENCODER, EMPTY_DECODER, EMPTY_HANDLER);
     }
 
-    public static <T> PacketHandler<T> create(Class<T> type, String nameID, int ID, BiConsumer<T, SimpleByteBuf> encoder, Function<SimpleByteBuf, T> decoder, IHandler<T> handler) {
+    public static <T extends IPacket> PacketHandler<T> create(Class<T> type, String nameID, int ID, BiConsumer<T, SimpleByteBuf> encoder, Function<SimpleByteBuf, T> decoder, IHandler<T> handler) {
         System.out.println("Created Packet Handler for: %s (Packet ID: %s)".formatted(type.getName(), ID));
         PacketHandler<T> packetHandler = new PacketHandler<>(type, nameID, ID, encoder, decoder, handler);
         PACKETS.put(ID, packetHandler);

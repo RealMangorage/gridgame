@@ -1,27 +1,24 @@
 package org.mangorage.gridgame.client;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
+import io.netty.buffer.Unpooled;
+import net.querz.nbt.tag.CompoundTag;
+import org.mangorage.mangonetwork.core.SimpleByteBuf;
 
 public class Test {
-    public record WrappedSocketAddress(InetSocketAddress address) implements Comparable<WrappedSocketAddress> {
-
-        @Override
-        public int compareTo(WrappedSocketAddress o) {
-            // Compare the addresses of the WrappedSocketAddresses
-            return this.address().toString().compareTo(o.address().toString());
-        }
-    }
     public static void main(String[] args) {
-        var a = new InetSocketAddress("localhost", 2);
-        var b = new InetSocketAddress("localhost", 2);
-        System.out.println(new WrappedSocketAddress(a).equals(new WrappedSocketAddress(b)));
-        System.out.println(a.equals(b));
+        CompoundTag tag = new CompoundTag();
+        CompoundTag tagB = new CompoundTag();
+        tagB.putInt("testb", 1000);
+        tag.putInt("test", 100);
+        tag.put("testc", tagB);
 
-        Map<InetSocketAddress, Object> OBJECTS = new HashMap<>();
-        OBJECTS.put(a, "LOL");
-        System.out.println(OBJECTS.get(b));
+        SimpleByteBuf byteBuf = new SimpleByteBuf(Unpooled.buffer());
+
+        byteBuf.writeNBT(tag);
+
+        CompoundTag result = byteBuf.readNBT();
+        System.out.println(result.getInt("test"));
+        System.out.println(result.get("testc", CompoundTag.class).getInt("testb"));
 
     }
 }

@@ -3,7 +3,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ByteProcessor;
+import net.querz.nbt.io.NBTDeserializer;
+import net.querz.nbt.io.NBTSerializer;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.tag.CompoundTag;
+import org.mangorage.gridgame.common.world.TilePos;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,6 +73,35 @@ public class SimpleByteBuf extends ByteBuf {
         byte[] bytes = new byte[readInt()];
         readBytes(bytes);
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    // Write NBT
+    public void writeNBT(CompoundTag tag) {
+        try {
+            var byteOutput = new ByteArrayOutputStream();
+            new NBTSerializer().toStream(new NamedTag(null, tag), byteOutput);
+            writeByteArray(byteOutput.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Read NBT
+    public CompoundTag readNBT() {
+        try {
+            return (CompoundTag) new NBTDeserializer().fromBytes(readByteArray()).getTag();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new CompoundTag();
+        }
+    }
+
+    public void writeTilePos(TilePos tilePos) {
+        writeLong(TilePos.pack(tilePos));
+    }
+
+    public TilePos readTilePos() {
+        return TilePos.unPack(readLong());
     }
 
 

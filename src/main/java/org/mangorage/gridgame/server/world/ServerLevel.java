@@ -67,7 +67,12 @@ public class ServerLevel extends Level {
     }
 
     @Override
+    public TileEntity getTileEntity(TilePos pos) {
+        return TILE_ENTITYS.get(TilePos.pack(pos));
+    }
+
+    @Override
     protected void tick() {
-        TILE_ENTITYS.forEach((k, e) -> e.tick());
+        TILE_ENTITYS.forEach((k, e) -> e.preTick());
     }
 }

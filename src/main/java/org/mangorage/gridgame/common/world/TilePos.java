@@ -1,6 +1,11 @@
 package org.mangorage.gridgame.common.world;
 
 public record TilePos(int x, int y, int z) {
+
+    public static long pack(TilePos pos) {
+        return pack(pos.x, pos.y, pos.z);
+    }
+
     public static long pack(int x, int y, int z) {
         // Pack the three integers into a single long
         // Shift x to the left by 42 bits, y by 21 bits, then combine with z using bitwise OR

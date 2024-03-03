@@ -40,6 +40,11 @@ public class ClientLevel extends Level {
     }
 
     @Override
+    public TileEntity getTileEntity(TilePos pos) {
+        return TILE_ENTITYS.get(TilePos.pack(pos));
+    }
+
+    @Override
     public int getSizeX() {
         return sizeX;
     }

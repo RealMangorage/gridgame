@@ -11,6 +11,7 @@ public abstract class Level {
 
     abstract public void setTile(TilePos pos, Tile tile, int flag);
     abstract public Tile getTile(TilePos pos);
+    abstract public TileEntity getTileEntity(TilePos pos);
 
     abstract protected void tick();
 }
