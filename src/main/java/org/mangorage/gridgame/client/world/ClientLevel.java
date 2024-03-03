@@ -93,7 +93,7 @@ public class ClientLevel extends Level {
                         var id = tiles[z][x][y];
                         var tile = Registries.TILE_REGISTRY.getObject(id);
 
-                        TileRendererManager.ITileRenderer<Tile, TileEntity> renderer = GridGameClient.getInstance().getRenderManager().getRenderer(tile);
+                        TileRendererManager.ITileRenderer<Tile, TileEntity> renderer = TileRendererManager.getInstance().getRenderer(tile);
 
                         if (renderer != null) {
                             var TE = TILE_ENTITYS.get(TilePos.pack(x, y, z));

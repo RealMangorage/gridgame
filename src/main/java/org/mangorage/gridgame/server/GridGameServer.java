@@ -1,8 +1,7 @@
 package org.mangorage.gridgame.server;
 
 import io.netty.channel.Channel;
-import org.mangorage.gridgame.client.GridGameClient;
-import org.mangorage.gridgame.common.BootStrap;
+import org.mangorage.gridgame.common.core.bootstrap.Bootstrap;
 import org.mangorage.gridgame.common.packets.WorldLoadPacket;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.TilePos;
@@ -12,7 +11,6 @@ import org.mangorage.gridgame.server.world.entities.ServerPlayer;
 import org.mangorage.mangonetwork.core.connection.IPipedConnection;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -21,14 +19,12 @@ public class GridGameServer {
     private static GridGameServer INSTANCE;
 
     public static void init(IPipedConnection pipedConnection) {
-        if (GridGameClient.getInstance() != null)
-            throw new IllegalStateException("Cannot start Server... Client already started");
+        //if (GridGameClient.getInstance() != null)
+           // throw new IllegalStateException("Cannot start Server... Client already started");
 
         if (INSTANCE != null) return;
 
         INSTANCE = new GridGameServer(pipedConnection);
-
-        BootStrap.init(true);
     }
 
     public static GridGameServer getInstance() {

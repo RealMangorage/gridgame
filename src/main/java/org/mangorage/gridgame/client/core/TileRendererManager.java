@@ -9,7 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class TileRendererManager {
+    private static final TileRendererManager renderManager = new TileRendererManager();
     private final Map<Tile, ITileRenderer<? extends Tile, ? extends TileEntity>> renderers = new HashMap<>();
+
+    public static TileRendererManager getInstance() {
+        return renderManager;
+    }
 
 
     public <E extends TileEntity, T extends Tile> void register(Holder<T> tileHolder, Class<E> tileEntity, ITileRenderer<T, E> renderer) {

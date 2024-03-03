@@ -1,8 +1,8 @@
 package org.mangorage.mangonetwork.core;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class Scheduler {
-    public final static ScheduledExecutorService RUNNER = Executors.newScheduledThreadPool(16);
+    public final static ScheduledThreadPoolExecutor RUNNER = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(4);
 }

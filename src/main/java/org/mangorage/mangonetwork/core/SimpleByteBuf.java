@@ -1,7 +1,6 @@
 package org.mangorage.mangonetwork.core;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.Unpooled;
 import io.netty.util.ByteProcessor;
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NBTSerializer;
@@ -22,13 +21,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class SimpleByteBuf extends ByteBuf {
-    public static void main(String[] args) {
-        SimpleByteBuf buf = new SimpleByteBuf(Unpooled.buffer());
-        buf.writeString("TEST");
-        buf.writeEnum(Side.SERVER);
-        System.out.println("Result -> '%s'".formatted(buf.readString()));
-        System.out.println(buf.readEnum(Side.class));
-    }
     private final ByteBuf source;
 
     public SimpleByteBuf(ByteBuf source) {

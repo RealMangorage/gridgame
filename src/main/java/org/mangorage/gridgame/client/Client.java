@@ -8,7 +8,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import org.mangorage.mangonetwork.Packets;
 import org.mangorage.mangonetwork.core.connection.Connection;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
@@ -22,14 +21,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
 
-    public static void main(String[] args) {
-        Packets.init();
-        if (args.length == 0) {
-            // 23.26.60.28:14126
-            new Client("localhost:25565");
-        } else {
-            new Client(args[0] + ":25565");
-        }
+    public static void init() {
+        init("localhost:25565");
+    }
+
+    public static void init(String server) {
+        new Client(server);
     }
 
     private final InetSocketAddress server;
@@ -54,6 +51,7 @@ public class Client {
                 Bootstrap b = new Bootstrap();
                 b.group(group)
                         .channel(NioDatagramChannel.class)
+                        .remoteAddress(server)
                         .handler(new ChannelInitializer<>() {
                             @Override
                             public void initChannel(Channel ch) {
@@ -81,15 +79,16 @@ public class Client {
                                     }
                                 });
 
+
                                 Client.this.channel.set(ch);
 
                                 System.out.println("Client Started...");
                             }
                         });
 
-                b.bind(0).sync().channel().closeFuture().await();
-            } catch (Exception ignored) {
-
+                b.connect().sync().channel().closeFuture().await();
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 group.shutdownGracefully();
             }

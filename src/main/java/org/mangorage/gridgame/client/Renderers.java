@@ -8,7 +8,7 @@ import org.mangorage.gridgame.common.world.tileentity.SolidWallTileEntity;
 import java.awt.*;
 
 public class Renderers {
-    private static final TileRendererManager MANAGER = GridGameClient.getInstance().getRenderManager();
+    private static final TileRendererManager MANAGER = TileRendererManager.getInstance();
 
     static {
         MANAGER.register(

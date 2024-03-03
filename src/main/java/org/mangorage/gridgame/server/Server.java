@@ -23,8 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class Server extends Thread {
     private static Server instance;
 
-    public static void main(String[] args)  {
-        Packets.init();
+    public static void init()  {
         instance = new Server(25565);
         instance.start();
     }

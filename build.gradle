@@ -31,7 +31,8 @@ dependencies {
     implementation 'org.tukaani:xz:1.8'
     implementation 'com.github.Fylipp:easy-events:1.+'
     implementation 'org.reflections:reflections:0.9.12'
-    implementation 'io.netty:netty-all:4.1.68.Final'
+    implementation 'io.netty:netty-all:4.1.100.Final'
+    implementation 'commons-cli:commons-cli:1.4'
 }
 
 test {
@@ -48,14 +49,44 @@ jar {
 
 task runGame(type: JavaExec) {
     // Set the main class to run
-    main = 'org.mangorage.gridgame.client.PublicClientMain'
+    main = 'org.mangorage.gridgame.common.core.bootstrap.Bootstrap'
     classpath = sourceSets.main.runtimeClasspath
 
-    setWorkingDir("build/run")
+    setWorkingDir("build/run/integrated")
+    setGroup("runs")
+    setArgsString("-i")
+
+    doFirst {
+        File runDir = file("build/run/integrated")
+        runDir.mkdirs()
+    }
+}
+
+task runServer(type: JavaExec) {
+    // Set the main class to run
+    main = 'org.mangorage.gridgame.common.core.bootstrap.Bootstrap'
+    classpath = sourceSets.main.runtimeClasspath
+
+    setWorkingDir("build/run/server")
+    setGroup("runs")
+    setArgsString("-s")
+
+    doFirst {
+        File runDir = file("build/run/server")
+        runDir.mkdirs()
+    }
+}
+
+task runClient(type: JavaExec) {
+    // Set the main class to run
+    main = 'org.mangorage.gridgame.common.core.bootstrap.Bootstrap'
+    classpath = sourceSets.main.runtimeClasspath
+
+    setWorkingDir("build/run/client")
     setGroup("runs")
 
     doFirst {
-        File runDir = file("build/run")
+        File runDir = file("build/run/client")
         runDir.mkdirs()
     }
 }
