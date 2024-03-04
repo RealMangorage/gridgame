@@ -35,9 +35,9 @@ public final class PipedConnection implements IPipedConnection {
     }
 
     @Override
-    public Connection join(InetSocketAddress address, Supplier<Channel> channelSupplier) {
+    public Connection join(InetSocketAddress address, Channel channel) {
         if (connections.containsKey(address)) return null;
-        var connection = new Connection(channelSupplier, address, packetSender);
+        var connection = new Connection(channel, address, packetSender);
         connections.put(address, connection);
         return connection;
     }

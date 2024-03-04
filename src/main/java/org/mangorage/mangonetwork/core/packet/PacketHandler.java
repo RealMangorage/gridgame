@@ -18,7 +18,7 @@ public class PacketHandler<T extends IPacket> {
 
     private static final BiConsumer<EmptyPacket, SimpleByteBuf> EMPTY_ENCODER = (p, b) -> {};
     private static final Function<SimpleByteBuf, EmptyPacket> EMPTY_DECODER = (s) -> EmptyPacket.INSTANCE;
-    private static final IHandler<EmptyPacket> EMPTY_HANDLER = (packet, origin, side) -> {};
+    private static final IHandler<EmptyPacket> EMPTY_HANDLER = (packet, ctx) -> {};
 
 
     public static PacketResponse<?> receivePacket(DatagramPacket datagramPacket) {
@@ -53,10 +53,10 @@ public class PacketHandler<T extends IPacket> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends IPacket> void handle(T packet, int packetId, InetSocketAddress origin, Side side) {
+    public static <T extends IPacket> void handle(T packet, int packetId, Context context) {
         try {
             if (PACKETS.containsKey(packetId)) {
-                ((PacketHandler<T>) PACKETS.get(packetId)).getHandler().handle(packet, origin, side);
+                ((PacketHandler<T>) PACKETS.get(packetId)).getHandler().handle(packet, context);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class PacketHandler<T extends IPacket> {
 
 
     public interface IHandler<T> {
-        void handle(T packet, InetSocketAddress origin, Side side);
+        void handle(T packet, Context context);
     }
 
     private final Class<T> clazz;

@@ -8,7 +8,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import org.mangorage.gridgame.common.packets.C2SPlayerJoinPacket;
 import org.mangorage.mangonetwork.core.connection.Connection;
+import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
@@ -22,28 +24,22 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Client {
 
     public static void init() {
-        init("localhost:25565");
+        init("localhost:25565", "MangoRage");
     }
 
-    public static void init(String server) {
-        new Client(server);
+    public static void init(String server, String username) {
+        new Client(server, username);
     }
 
     private final InetSocketAddress server;
     private final AtomicReference<Channel> channel = new AtomicReference<>();
 
-    private final PacketSender packetSender = new PacketSender(Side.CLIENT);
-    private final Connection connection;
 
-
-    public Client(String IP) {
+    public Client(String IP, String username) {
         System.out.println("Starting Client Version 1.0 to IP: %s".formatted(IP));
         String[] ipArr = IP.split(":");
 
         this.server = new InetSocketAddress(ipArr[0], Integer.parseInt(ipArr[1]));
-        this.connection = new Connection(channel::get, server, packetSender);
-
-        GridGameClient.init(connection);
 
         CompletableFuture.runAsync(() -> {
             EventLoopGroup group = new NioEventLoopGroup();
@@ -58,18 +54,11 @@ public class Client {
                                 ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
 
                                     @Override
-                                    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                        Client.this.channel.set(ctx.channel());
-                                    }
-
-                                    @Override
                                     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
                                         PacketResponse<?> response = PacketHandler.receivePacket(packet);
                                         if (response != null) {
                                             Scheduler.RUNNER.execute(() -> {
-                                                PacketHandler.handle(response.packet(), response.packetId(), response.source(), response.sentFrom());
-
-                                                Client.this.channel.set(ctx.channel());
+                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ctx.channel(), response.sentFrom()));
 
                                                 System.out.printf("Received Packet: %s%n", response.packetName());
                                                 System.out.printf("From Side: %s%n", response.sentFrom());
@@ -80,13 +69,19 @@ public class Client {
                                 });
 
 
-                                Client.this.channel.set(ch);
-
                                 System.out.println("Client Started...");
                             }
+
+
                         });
 
-                b.connect().sync().channel().closeFuture().await();
+                var chl = b.connect().sync().channel();
+
+                Connection connection = new Connection(chl, server, new PacketSender(Side.CLIENT));
+                GridGameClient.init(connection);
+
+                connection.send(new C2SPlayerJoinPacket(username));
+                chl.closeFuture().await();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

@@ -6,15 +6,13 @@ import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketSender;
 
 import java.net.InetSocketAddress;
-import java.util.function.Supplier;
-
 public final class Connection implements IConnection {
     private final PacketSender packetSender;
     private final InetSocketAddress address;
-    private final Supplier<Channel> channelSupplier;
+    private final Channel channel;
 
-    public Connection(Supplier<Channel> channelSupplier, InetSocketAddress address, PacketSender packetSender) {
-        this.channelSupplier = channelSupplier;
+    public Connection(Channel channel, InetSocketAddress address, PacketSender packetSender) {
+        this.channel = channel;
         this.packetSender = packetSender;
         this.address = address;
     }
@@ -31,7 +29,7 @@ public final class Connection implements IConnection {
                 packet,
                 packetSender,
                 address,
-                channelSupplier.get()
+                channel
         );
     }
 }

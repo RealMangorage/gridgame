@@ -6,9 +6,9 @@ import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
+import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
 
-import java.net.InetSocketAddress;
 
 public class S2CTileEntityUpdatePacket implements IPacket {
     private final TilePos tilePos;
@@ -31,8 +31,8 @@ public class S2CTileEntityUpdatePacket implements IPacket {
     }
 
     @Override
-    public void handle(InetSocketAddress originAddress, Side fromSide) {
-        if (fromSide == Side.SERVER) {
+    public void handle(Context ctx) {
+        if (ctx.from() == Side.SERVER) {
             GridGameClient.getInstance().getLevel().getTileEntity(tilePos).loadUpdateTag(tag);
         }
     }

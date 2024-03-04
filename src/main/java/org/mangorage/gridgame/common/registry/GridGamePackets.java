@@ -1,5 +1,6 @@
 package org.mangorage.gridgame.common.registry;
 
+import org.mangorage.gridgame.common.packets.C2SPlayerJoinPacket;
 import org.mangorage.gridgame.common.packets.C2SPlayerMovePacket;
 import org.mangorage.gridgame.common.packets.S2CPlayerMovePacket;
 import org.mangorage.gridgame.common.packets.S2CTileEntityUpdatePacket;
@@ -9,6 +10,11 @@ import org.mangorage.mangonetwork.core.packet.PacketHandler;
 
 public class GridGamePackets {
     public static int ID = 1000;
+
+    public static final PacketHandler<C2SPlayerJoinPacket> PLAYER_JOIN_PACKET = PacketHandler.create(
+            C2SPlayerJoinPacket.class,
+            ID++
+    );
 
     public static final PacketHandler<WorldLoadPacket> WORLD_LOAD_PACKET = PacketHandler.create(
             WorldLoadPacket.class,

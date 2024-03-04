@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.mangorage.mangonetwork.Packets;
 import org.mangorage.mangonetwork.core.connection.IPipedConnection;
 import org.mangorage.mangonetwork.core.connection.PipedConnection;
+import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 import org.mangorage.mangonetwork.core.Scheduler;
@@ -54,17 +55,15 @@ public class Server extends Thread {
 
                             ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
                                 @Override
-                                protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
+                                protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
                                     PacketResponse<?> response = PacketHandler.receivePacket(packet);
                                     if (response != null) {
                                         Scheduler.RUNNER.schedule(() -> {
-                                            PacketHandler.handle(response.packet(), response.packetId(), response.source(), response.sentFrom());
+                                            PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ch ,response.sentFrom()));
 
                                             System.out.printf("Received Packet: %s%n", response.packetName());
                                             System.out.printf("From Side: %s%n", response.sentFrom());
                                             System.out.printf("Source: %s%n", response.source());
-
-                                            GridGameServer.getInstance().addPlayer(response.source(), () -> ch);
                                         }, 10, TimeUnit.MILLISECONDS);
                                     }
                                 }

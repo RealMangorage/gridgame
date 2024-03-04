@@ -46,9 +46,7 @@ public abstract class TileEntity {
         tick();
     }
 
-    public void tick() {
-
-    }
+    public void tick() {}
 
     public void markDirty() {
         dirty = true;
@@ -62,6 +60,8 @@ public abstract class TileEntity {
         return null;
     }
 
-    public void loadUpdateTag(CompoundTag tag) {
-    }
+    public void loadUpdateTag(CompoundTag tag) {}
+
+    public void load(CompoundTag tag) {}
+    public CompoundTag save() {return new CompoundTag();}
 }

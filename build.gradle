@@ -42,7 +42,7 @@ test {
 jar {
     manifest {
         attributes(
-            'Main-Class' : 'org.mangorage.gridgame.client.PublicClientMain'
+            'Main-Class' : 'org.mangorage.gridgame.common.core.bootstrap.Bootstrap'
         )
     }
 }

@@ -1,9 +1,6 @@
 package org.mangorage.mangonetwork.core.packet;
 
-import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
-
-import java.net.InetSocketAddress;
 
 public sealed abstract class EmptyPacket implements IPacket permits EmptyPacket.MainEmptyPacket {
     public static final EmptyPacket INSTANCE = new MainEmptyPacket();
@@ -16,7 +13,7 @@ public sealed abstract class EmptyPacket implements IPacket permits EmptyPacket.
         }
 
         @Override
-        public void handle(InetSocketAddress originAddress, Side fromSide) {
+        public void handle(Context ctx) {
 
         }
     }

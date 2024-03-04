@@ -1,9 +1,6 @@
 package org.mangorage.mangonetwork.core.packet;
 
-import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
-
-import java.net.InetSocketAddress;
 import java.util.function.Function;
 
 public interface IPacket {
@@ -22,5 +19,5 @@ public interface IPacket {
 
     // fromSide -> The side that sent the packet, so if we get packets from Server, we are on client
     // if we get packets from client, we are on server...
-    void handle(InetSocketAddress originAddress, Side fromSide);
+    void handle(Context ctx);
 }

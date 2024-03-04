@@ -6,6 +6,7 @@ import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
+import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
 
 import java.net.InetSocketAddress;
@@ -34,8 +35,8 @@ public class TileUpdatePacket implements IPacket {
 
     // side -> The side that sent the packet, so if we get packets from Server, we are on client
     // if we get packets from client, we are on server...
-    public void handle(InetSocketAddress origin, Side from) {
-        if (from == Side.SERVER) {
+    public void handle(Context ctx) {
+        if (ctx.from() == Side.SERVER) {
             GridGameClient.getInstance().getLevel().setTile(
                     new TilePos(posX, posY, posZ),
                     Registries.TILE_REGISTRY.getObject(tileID),

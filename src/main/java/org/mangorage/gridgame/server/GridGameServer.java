@@ -40,10 +40,10 @@ public class GridGameServer {
     }
 
 
-    public void addPlayer(InetSocketAddress address, Supplier<Channel> channelSupplier) {
-        var connection = pipedConnection.join(address, channelSupplier);
+    public void addPlayer(InetSocketAddress address, Channel channel, String username) {
+        var connection = pipedConnection.join(address, channel);
         if (connection != null) {
-            PLAYERS.put(address, new ServerPlayer(serverLevel, connection));
+            PLAYERS.put(address, new ServerPlayer(serverLevel, username, connection));
             pipedConnection.send(new WorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()), address);
             serverLevel.setTile(new TilePos(0, 0, 0), TileRegistry.SOLD_TILE.get(), 2);
         }

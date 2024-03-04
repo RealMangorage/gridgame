@@ -7,10 +7,12 @@ import org.mangorage.mangonetwork.core.connection.Connection;
 
 public abstract class Player {
     private final Level level;
+    private final String username;
     private TilePos pos = new TilePos(0, 0, 1);
 
-    public Player(Level level) {
+    public Player(Level level, String username) {
         this.level = level;
+        this.username = username;
     }
 
 
@@ -28,5 +30,9 @@ public abstract class Player {
 
     public Level getLevel() {
         return level;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

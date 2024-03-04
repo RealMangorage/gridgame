@@ -4,14 +4,15 @@ import org.mangorage.gridgame.common.core.Direction;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.common.world.entities.Player;
+import org.mangorage.gridgame.common.world.tileentity.PlayerTileEntity;
 import org.mangorage.gridgame.server.world.ServerLevel;
 import org.mangorage.mangonetwork.core.connection.Connection;
 
 public final class ServerPlayer extends Player {
     private final Connection connection;
 
-    public ServerPlayer(ServerLevel level, Connection connection) {
-        super(level);
+    public ServerPlayer(ServerLevel level, String username, Connection connection) {
+        super(level, username);
         this.connection = connection;
     }
 
@@ -21,6 +22,10 @@ public final class ServerPlayer extends Player {
         getLevel().setTile(getPos(), TileRegistry.EMPTY_TILE.get(), 2);
         setPos(pos);
         getLevel().setTile(getPos(), TileRegistry.PLAYER_TILE.get(), 2);
+
+        var TE = getLevel().getTileEntity(getPos());
+        if (TE != null && TE instanceof PlayerTileEntity PTE)
+            PTE.setUsername(getUsername());
     }
 
     @Override

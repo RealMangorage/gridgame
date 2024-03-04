@@ -3,9 +3,8 @@ package org.mangorage.gridgame.common.packets;
 import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
+import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
-
-import java.net.InetSocketAddress;
 
 public class WorldLoadPacket implements IPacket {
     private final int sizeX, sizeY, sizeZ;
@@ -26,8 +25,8 @@ public class WorldLoadPacket implements IPacket {
         buffer.writeInt(sizeZ);
     }
 
-    public void handle(InetSocketAddress origin, Side from) {
-        if (from == Side.SERVER) {
+    public void handle(Context ctx) {
+        if (ctx.from() == Side.SERVER) {
             GridGameClient.getInstance().getLevel().setTiles(sizeX, sizeY, sizeZ);
         }
     }

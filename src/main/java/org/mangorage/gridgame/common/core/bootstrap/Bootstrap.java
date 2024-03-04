@@ -65,12 +65,12 @@ public class Bootstrap {
                 Server.init();
             } else {
                 System.out.println("Starting Client");
-                var IP = MenuUtils.showInputDialog("IP for Server");
-                if (IP == null || IP.isBlank()) {
+                var data = MenuUtils.showInputDialog("IP for Server");
+                if (data == null || data.isBlank()) {
                     System.out.println("Closing Program...");
                     System.exit(0);
                 } else {
-                    Client.init(IP);
+                    Client.init(data.IP(), data.username());
                 }
             }
         }
