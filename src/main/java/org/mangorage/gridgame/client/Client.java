@@ -8,14 +8,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import org.mangorage.gridgame.common.packets.C2SPlayerJoinPacket;
+import org.mangorage.gridgame.common.packets.serverbound.C2SPlayerJoinPacket;
 import org.mangorage.mangonetwork.core.connection.Connection;
 import org.mangorage.mangonetwork.core.packet.Context;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
-import org.mangorage.mangonetwork.core.Scheduler;
-import org.mangorage.mangonetwork.core.Side;
-import org.mangorage.mangonetwork.core.packet.PacketSender;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -55,13 +53,13 @@ public class Client {
 
                                     @Override
                                     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
-                                        PacketResponse<?> response = PacketHandler.receivePacket(packet);
+                                        PacketResponse<?> response = PacketHandler.receivePacket(packet, PacketFlow.CLIENTBOUND);
                                         if (response != null) {
-                                            Scheduler.RUNNER.execute(() -> {
-                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ctx.channel(), response.sentFrom()));
+                                            PacketHandler.execute(() -> {
+                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ctx.channel(), response.packetFlow()));
 
                                                 System.out.printf("Received Packet: %s%n", response.packetName());
-                                                System.out.printf("From Side: %s%n", response.sentFrom());
+                                                System.out.printf("PacketFlow: %s%n", response.packetFlow());
                                                 System.out.printf("Source: %s%n", response.source());
                                             });
                                         }
@@ -77,7 +75,7 @@ public class Client {
 
                 var chl = b.connect().sync().channel();
 
-                Connection connection = new Connection(chl, server, new PacketSender(Side.CLIENT));
+                Connection connection = new Connection(chl, server, PacketFlow.SERVERBOUND);
                 GridGameClient.init(connection);
 
                 connection.send(new C2SPlayerJoinPacket(username));

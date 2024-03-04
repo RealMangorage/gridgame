@@ -9,15 +9,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import org.mangorage.mangonetwork.Packets;
 import org.mangorage.mangonetwork.core.connection.IPipedConnection;
 import org.mangorage.mangonetwork.core.connection.PipedConnection;
 import org.mangorage.mangonetwork.core.packet.Context;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
-import org.mangorage.mangonetwork.core.Scheduler;
-import org.mangorage.mangonetwork.core.Side;
-import org.mangorage.mangonetwork.core.packet.PacketSender;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,8 +27,7 @@ public class Server extends Thread {
     }
 
     private final int port;
-    private final PacketSender packetSender = new PacketSender(Side.SERVER);
-    private final IPipedConnection pipedConnection = new PipedConnection(packetSender);
+    private final IPipedConnection pipedConnection = new PipedConnection();
 
     private Server(int port) {
         System.out.println("Starting Server Version 1.0");
@@ -56,13 +52,13 @@ public class Server extends Thread {
                             ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
-                                    PacketResponse<?> response = PacketHandler.receivePacket(packet);
+                                    PacketResponse<?> response = PacketHandler.receivePacket(packet, PacketFlow.SERVERBOUND);
                                     if (response != null) {
-                                        Scheduler.RUNNER.schedule(() -> {
-                                            PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ch ,response.sentFrom()));
+                                        PacketHandler.schedule(() -> {
+                                            PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ch, response.packetFlow()));
 
                                             System.out.printf("Received Packet: %s%n", response.packetName());
-                                            System.out.printf("From Side: %s%n", response.sentFrom());
+                                            System.out.printf("PacketFlow: %s%n", response.packetFlow());
                                             System.out.printf("Source: %s%n", response.source());
                                         }, 10, TimeUnit.MILLISECONDS);
                                     }

@@ -1,21 +1,21 @@
-package org.mangorage.gridgame.common.packets;
+package org.mangorage.gridgame.common.packets.clientbound;
 
 import org.mangorage.gridgame.client.GridGameClient;
-import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
-public class WorldLoadPacket implements IPacket {
+public class S2CWorldLoadPacket implements IPacket {
     private final int sizeX, sizeY, sizeZ;
 
-    public WorldLoadPacket(int sizeX, int sizeY, int sizeZ) {
+    public S2CWorldLoadPacket(int sizeX, int sizeY, int sizeZ) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
     }
 
-    public WorldLoadPacket(SimpleByteBuf byteBuf) {
+    public S2CWorldLoadPacket(SimpleByteBuf byteBuf) {
         this(byteBuf.readInt(), byteBuf.readInt(), byteBuf.readInt());
     }
 
@@ -26,8 +26,6 @@ public class WorldLoadPacket implements IPacket {
     }
 
     public void handle(Context ctx) {
-        if (ctx.from() == Side.SERVER) {
-            GridGameClient.getInstance().getLevel().setTiles(sizeX, sizeY, sizeZ);
-        }
+        GridGameClient.getInstance().getLevel().setTiles(sizeX, sizeY, sizeZ);
     }
 }

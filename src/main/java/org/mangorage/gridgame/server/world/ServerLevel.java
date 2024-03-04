@@ -2,18 +2,20 @@ package org.mangorage.gridgame.server.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import org.mangorage.gridgame.common.Registries;
-import org.mangorage.gridgame.common.packets.TileUpdatePacket;
+import org.mangorage.gridgame.common.packets.clientbound.S2CTileUpdatePacket;
 import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.Tile;
 import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.server.GridGameServer;
-import org.mangorage.mangonetwork.core.Scheduler;
-import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.LogicalSide;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ServerLevel extends Level {
+    private final ScheduledExecutorService RUNNER = Executors.newScheduledThreadPool(1);
     private final byte[][][] tiles;
     private final int sizeX, sizeY, sizeZ;
 
@@ -25,7 +27,7 @@ public class ServerLevel extends Level {
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
 
-        Scheduler.RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
+        RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
     }
 
     public int getSizeX() {
@@ -52,13 +54,13 @@ public class ServerLevel extends Level {
         var id = Registries.TILE_REGISTRY.getID(tile);
         this.tiles[pos.z()][pos.x()][pos.z()] = id;
 
-        var TE = tile.createTileEntity(this, pos, Side.SERVER);
+        var TE = tile.createTileEntity(this, pos, LogicalSide.SERVER);
         var packedPos = TilePos.pack(pos.x(), pos.y(), pos.z());
         TILE_ENTITYS.remove(packedPos);
         if (TE != null)
             TILE_ENTITYS.put(packedPos, TE);
 
-        GridGameServer.getInstance().getPipedConnection().send(new TileUpdatePacket(pos, id));
+        GridGameServer.getInstance().getPipedConnection().send(new S2CTileUpdatePacket(pos, id));
     }
 
     @Override

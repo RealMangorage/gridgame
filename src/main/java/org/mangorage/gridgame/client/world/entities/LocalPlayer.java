@@ -3,7 +3,7 @@ package org.mangorage.gridgame.client.world.entities;
 import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.gridgame.client.world.ClientLevel;
 import org.mangorage.gridgame.common.core.Direction;
-import org.mangorage.gridgame.common.packets.C2SPlayerMovePacket;
+import org.mangorage.gridgame.common.packets.serverbound.C2SPlayerMovePacket;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.mangonetwork.core.connection.Connection;

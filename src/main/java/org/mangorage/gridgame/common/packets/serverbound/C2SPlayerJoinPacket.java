@@ -1,7 +1,6 @@
-package org.mangorage.gridgame.common.packets;
+package org.mangorage.gridgame.common.packets.serverbound;
 
 import org.mangorage.gridgame.server.GridGameServer;
-import org.mangorage.mangonetwork.core.Side;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
@@ -24,8 +23,6 @@ public class C2SPlayerJoinPacket implements IPacket {
 
     @Override
     public void handle(Context ctx) {
-        if (ctx.from() == Side.CLIENT) {
-            GridGameServer.getInstance().addPlayer(ctx.socketAddress(), ctx.channel(), username);
-        }
+        GridGameServer.getInstance().addPlayer(ctx.socketAddress(), ctx.channel(), username);
     }
 }

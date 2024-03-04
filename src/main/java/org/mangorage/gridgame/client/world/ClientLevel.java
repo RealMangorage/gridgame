@@ -1,20 +1,21 @@
 package org.mangorage.gridgame.client.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
-import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.common.Registries;
 import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.Tile;
 import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
-import org.mangorage.mangonetwork.core.Scheduler;
-import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.LogicalSide;
 
 import java.awt.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ClientLevel extends Level {
+    private final ScheduledExecutorService RUNNER = Executors.newScheduledThreadPool(1);
     private byte[][][] tiles;
     private int sizeX, sizeY, sizeZ;
 
@@ -22,7 +23,7 @@ public class ClientLevel extends Level {
 
 
     public ClientLevel() {
-        Scheduler.RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
+        RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
     }
 
     public void setTiles(int x, int y, int z) {
@@ -70,7 +71,7 @@ public class ClientLevel extends Level {
         if (flag == 2) {
             tiles[pos.z()][pos.x()][pos.y()] = Registries.TILE_REGISTRY.getID(tile);
 
-            var TE = tile.createTileEntity(this, pos, Side.SERVER);
+            var TE = tile.createTileEntity(this, pos, LogicalSide.SERVER);
             var packedPos = TilePos.pack(pos.x(), pos.y(), pos.z());
             TILE_ENTITYS.remove(packedPos);
             if (TE != null)

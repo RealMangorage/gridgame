@@ -2,19 +2,19 @@ package org.mangorage.mangonetwork.core.connection;
 
 import io.netty.channel.Channel;
 import org.mangorage.mangonetwork.core.packet.IPacket;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
-import org.mangorage.mangonetwork.core.packet.PacketSender;
 
 import java.net.InetSocketAddress;
 public final class Connection implements IConnection {
-    private final PacketSender packetSender;
     private final InetSocketAddress address;
     private final Channel channel;
+    private final PacketFlow packetFlow;
 
-    public Connection(Channel channel, InetSocketAddress address, PacketSender packetSender) {
+    public Connection(Channel channel, InetSocketAddress address, PacketFlow packetFlow) {
         this.channel = channel;
-        this.packetSender = packetSender;
         this.address = address;
+        this.packetFlow = packetFlow;
     }
 
     public InetSocketAddress getAddress() {
@@ -27,7 +27,7 @@ public final class Connection implements IConnection {
         PacketHandler<IPacket> iPacket = (PacketHandler<IPacket>) PacketHandler.get(packet.getClass());
         iPacket.send(
                 packet,
-                packetSender,
+                packetFlow,
                 address,
                 channel
         );

@@ -1,20 +1,20 @@
 package org.mangorage.gridgame.common.world.tileentity;
 
 import net.querz.nbt.tag.CompoundTag;
-import org.mangorage.gridgame.common.packets.S2CTileEntityUpdatePacket;
+import org.mangorage.gridgame.common.packets.clientbound.S2CTileEntityUpdatePacket;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
-import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.LogicalSide;
 
 public class SolidWallTileEntity extends TileEntity {
     private int ticks = 0;
     private boolean doTick = false;
     private boolean useCobble = false;
 
-    public SolidWallTileEntity(Level level, TilePos pos, Side side) {
-        super(level, pos, side);
+    public SolidWallTileEntity(Level level, TilePos pos, LogicalSide logicalSide) {
+        super(level, pos, logicalSide);
     }
 
     public boolean isUseCobble() {
@@ -23,7 +23,7 @@ public class SolidWallTileEntity extends TileEntity {
 
     @Override
     public void tick() {
-        if (getSide() == Side.SERVER) {
+        if (getSide() == LogicalSide.SERVER) {
             ticks++;
             if (ticks % 20 == 0) {
                 useCobble = !useCobble;
@@ -32,7 +32,7 @@ public class SolidWallTileEntity extends TileEntity {
         }
 
 
-        if (getSide() == Side.SERVER && doTick) {
+        if (getSide() == LogicalSide.SERVER && doTick) {
             ticks++;
             var maxY = getLevel().getSizeY();
             var pos = getPos();

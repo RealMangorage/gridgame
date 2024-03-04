@@ -1,18 +1,18 @@
 package org.mangorage.gridgame.common.world.tileentity;
 
 import net.querz.nbt.tag.CompoundTag;
-import org.mangorage.gridgame.common.packets.S2CTileEntityUpdatePacket;
+import org.mangorage.gridgame.common.packets.clientbound.S2CTileEntityUpdatePacket;
 import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.TileEntity;
 import org.mangorage.gridgame.common.world.TilePos;
-import org.mangorage.mangonetwork.core.Side;
+import org.mangorage.mangonetwork.core.LogicalSide;
 
 public class PlayerTileEntity extends TileEntity {
 
     private String username;
 
-    public PlayerTileEntity(Level level, TilePos pos, Side side) {
-        super(level, pos, side);
+    public PlayerTileEntity(Level level, TilePos pos, LogicalSide logicalSide) {
+        super(level, pos, logicalSide);
     }
 
     public String getUsername() {

@@ -2,13 +2,13 @@ package org.mangorage.mangonetwork.core.connection;
 
 import io.netty.channel.Channel;
 import org.mangorage.mangonetwork.core.packet.IPacket;
-import org.mangorage.mangonetwork.core.packet.PacketSender;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
+// Server Sided Connection
 public final class PipedConnection implements IPipedConnection {
     private static final IConnection EMPTY_CONNECTION = new IConnection() {
         @Override
@@ -18,10 +18,9 @@ public final class PipedConnection implements IPipedConnection {
     };
 
     private final Map<InetSocketAddress, IConnection> connections = new ConcurrentHashMap<>();
-    private final PacketSender packetSender;
 
-    public PipedConnection(PacketSender sender) {
-        this.packetSender = sender;
+    public PipedConnection() {
+
     }
 
     @Override
@@ -37,7 +36,7 @@ public final class PipedConnection implements IPipedConnection {
     @Override
     public Connection join(InetSocketAddress address, Channel channel) {
         if (connections.containsKey(address)) return null;
-        var connection = new Connection(channel, address, packetSender);
+        var connection = new Connection(channel, address, PacketFlow.CLIENTBOUND);
         connections.put(address, connection);
         return connection;
     }
