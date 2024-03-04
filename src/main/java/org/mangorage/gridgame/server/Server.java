@@ -1,5 +1,6 @@
 package org.mangorage.gridgame.server;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +10,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.util.ReferenceCountUtil;
 import org.mangorage.mangonetwork.core.connection.IPipedConnection;
 import org.mangorage.mangonetwork.core.connection.PipedConnection;
 import org.mangorage.mangonetwork.core.packet.Context;
@@ -16,6 +19,7 @@ import org.mangorage.mangonetwork.core.packet.PacketFlow;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 import org.mangorage.mangonetwork.core.packet.PacketResponse;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Server extends Thread {
@@ -49,6 +53,18 @@ public class Server extends Thread {
                         @Override
                         public void initChannel(final Channel ch) {
 
+                            ch.pipeline().addLast(new MessageToMessageDecoder<DatagramPacket>() {
+                                @Override
+                                protected void decode(ChannelHandlerContext channelHandlerContext, DatagramPacket msg, List<Object> out) {
+                                    ByteBuf content = msg.content();
+                                    if (content.readableBytes() >= PacketHandler.MAX_PACKET_SIZE) {
+                                        System.out.println("Dropped packet: Packet size exceeds the allowed limit");
+                                        return;
+                                    }
+                                    out.add(msg.retain());
+                                }
+                            });
+
                             ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
@@ -72,7 +88,7 @@ public class Server extends Thread {
 
             b.bind(port).sync().channel().closeFuture().await();
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
             group.shutdownGracefully();
         }

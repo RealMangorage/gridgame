@@ -18,6 +18,6 @@ public interface IPacket {
     void encode(SimpleByteBuf buffer);
 
     // fromSide -> The side that sent the packet, so if we get packets from Server, we are on client
-    // if we get packets from client, we are on server...
+    // if we get packets from a client, we are on server...
     void handle(Context ctx);
 }

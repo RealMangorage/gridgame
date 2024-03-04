@@ -7,8 +7,10 @@ import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
+import org.mangorage.mangonetwork.core.packet.PacketDirection;
 import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
+@PacketDirection(flow = PacketFlow.CLIENTBOUND)
 public class S2CTileUpdatePacket implements IPacket {
     private final int posX, posY, posZ;
     private final byte tileID;

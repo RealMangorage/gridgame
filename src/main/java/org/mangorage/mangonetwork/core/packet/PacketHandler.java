@@ -17,11 +17,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+@SuppressWarnings("unchecked")
 public final class PacketHandler<T extends IPacket> {
     private final static ScheduledThreadPoolExecutor EXECUTOR = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(4);
-
-
-    private static final int MAX_PACKET_SIZE = 65536;
+    public static final int MAX_PACKET_SIZE = 65536;
 
     private static final Int2ObjectMap<PacketHandler<?>> PACKETS = new Int2ObjectArrayMap<>();
     private static final Map<Class<?>, PacketHandler<?>> PACKETS_REVERSE = new HashMap<>();
@@ -69,6 +68,26 @@ public final class PacketHandler<T extends IPacket> {
         }
     }
 
+    public static <T extends IPacket> PacketHandler<T> create(Class<T> type, int ID) {
+        return create(
+                type,
+                ID,
+                IPacket::encode,
+                IPacket.create(type),
+                IPacket::handle
+        );
+    }
+
+    public static <T extends IPacket> PacketHandler<T> create(Class<T> type, int ID, BiConsumer<T, SimpleByteBuf> encoder, Function<SimpleByteBuf, T> decoder, IHandler<T> handler) {
+        var annotation = type.getAnnotation(PacketDirection.class);
+        if (annotation == null)
+            throw new IllegalStateException("org.mangorage.mangonetwork.core.packet.PacketDirection is missing from %s".formatted(type));
+
+        return create(type, type.getName(), ID, annotation.flow(), encoder, decoder, handler);
+    }
+
+
+
     public static <T extends IPacket> PacketHandler<T> create(Class<T> type, int ID, PacketFlow packetFlow) {
         return create(
                 type,
@@ -91,6 +110,7 @@ public final class PacketHandler<T extends IPacket> {
         PACKETS_REVERSE.put(type, packetHandler);
         return packetHandler;
     }
+
 
     public static <T extends IPacket> PacketHandler<T> getId(int id) {
         return (PacketHandler<T>) PACKETS.get(id);
@@ -132,7 +152,7 @@ public final class PacketHandler<T extends IPacket> {
         this.handler = handler;
     }
 
-    public void send(T packet, PacketFlow packetFlow, InetSocketAddress sendTo, Channel channel) {
+    public void send(T packet, PacketFlow packetFlow, InetSocketAddress recipient, Channel channel) {
         if (this.packetFlow == packetFlow.getOpposite()) {
             System.out.println("Cannot send packet %s to %s, only goes to %s".formatted(packet.getClass(), packetFlow, this.packetFlow));
             return;
@@ -153,9 +173,8 @@ public final class PacketHandler<T extends IPacket> {
         }
 
         try {
-            DatagramPacket datagramPacket = new DatagramPacket(headerBuffer, sendTo);
+            DatagramPacket datagramPacket = new DatagramPacket(headerBuffer, recipient);
             channel.writeAndFlush(datagramPacket).sync();
-
             System.out.println("Sent Packet %s to %s with size of %s bytes".formatted(packet.getClass().getName(), packetFlow, datagramPacket.content().readableBytes()));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

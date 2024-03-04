@@ -4,8 +4,10 @@ import org.mangorage.gridgame.client.GridGameClient;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
+import org.mangorage.mangonetwork.core.packet.PacketDirection;
 import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
+@PacketDirection(flow = PacketFlow.CLIENTBOUND)
 public class S2CWorldLoadPacket implements IPacket {
     private final int sizeX, sizeY, sizeZ;
 

@@ -4,7 +4,10 @@ import org.mangorage.gridgame.server.GridGameServer;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
+import org.mangorage.mangonetwork.core.packet.PacketDirection;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
+@PacketDirection(flow = PacketFlow.SERVERBOUND)
 public class C2SPlayerJoinPacket implements IPacket {
     private final String username;
 
