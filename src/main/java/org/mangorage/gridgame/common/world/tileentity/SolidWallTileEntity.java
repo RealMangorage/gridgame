@@ -12,6 +12,7 @@ public class SolidWallTileEntity extends TileEntity {
     private int ticks = 0;
     private boolean doTick = false;
     private boolean useCobble = false;
+    private int mode = 0;
 
     public SolidWallTileEntity(Level level, TilePos pos, LogicalSide logicalSide) {
         super(level, pos, logicalSide);
@@ -23,30 +24,43 @@ public class SolidWallTileEntity extends TileEntity {
 
     @Override
     public void tick() {
-        if (getSide() == LogicalSide.SERVER) {
-            ticks++;
+        ticks++;
+        if (!isClientSide()) {
             if (ticks % 20 == 0) {
+
                 useCobble = !useCobble;
                 markDirty();
-            }
-        }
 
+                var maxY = getLevel().getSizeY() - 1;
+                var pos = getPos();
 
-        if (getSide() == LogicalSide.SERVER && doTick) {
-            ticks++;
-            var maxY = getLevel().getSizeY();
-            var pos = getPos();
-            if (pos.y() + 1 < maxY && ticks % 20 == 0) {
-                getLevel().setTile(pos, TileRegistry.EMPTY_TILE.get(), 1);
-                getLevel().setTile(
-                        new TilePos(
-                                pos.x(),
-                                pos.y() + 1,
-                                pos.z()
-                        ),
-                        TileRegistry.SOLD_TILE.get(),
-                        1
-                );
+                if (pos.y() < maxY && mode == 0) {
+                    getLevel().setTile(pos, TileRegistry.EMPTY_TILE.get(), 1);
+                    var newPos = new TilePos(pos.x(), pos.y() + 1, pos.z());
+                    getLevel().setTile(newPos, TileRegistry.SOLD_TILE.get(), 1);
+                    var TE = getLevel().getTileEntity(newPos);
+                    if (TE instanceof SolidWallTileEntity STE) {
+                        STE.ticks = this.ticks;
+                        STE.useCobble = this.useCobble;
+                        STE.mode = mode;
+                        STE.markDirty();
+                    }
+                } else if (mode == 0) {
+                    mode = 1;
+                } else if (pos.y() > 0 && mode == 1) {
+                    getLevel().setTile(pos, TileRegistry.EMPTY_TILE.get(), 1);
+                    var newPos = new TilePos(pos.x(), pos.y() - 1, pos.z());
+                    getLevel().setTile(newPos, TileRegistry.SOLD_TILE.get(), 1);
+                    var TE = getLevel().getTileEntity(newPos);
+                    if (TE instanceof SolidWallTileEntity STE) {
+                        STE.ticks = this.ticks;
+                        STE.useCobble = this.useCobble;
+                        STE.mode = mode;
+                        STE.markDirty();
+                    }
+                } else {
+                    mode = 0;
+                }
             }
         }
     }

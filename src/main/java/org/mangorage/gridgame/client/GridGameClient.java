@@ -1,10 +1,8 @@
 package org.mangorage.gridgame.client;
 
-import org.mangorage.gridgame.client.core.TileRendererManager;
 import org.mangorage.gridgame.client.screen.RenderableScreen;
 import org.mangorage.gridgame.client.world.ClientLevel;
 import org.mangorage.gridgame.client.world.entities.LocalPlayer;
-import org.mangorage.gridgame.common.core.bootstrap.Bootstrap;
 import org.mangorage.gridgame.common.Events;
 import org.mangorage.gridgame.common.core.Direction;
 import org.mangorage.gridgame.common.world.entities.Player;
@@ -20,13 +18,10 @@ import java.awt.event.MouseWheelListener;
 public class GridGameClient implements KeyListener, MouseListener, MouseWheelListener {
     private static GridGameClient INSTANCE;
 
-    public static void init(Connection connection) {
-        //if (GridGameServer.getInstance() != null)
-           // throw new IllegalStateException("Cant start Client... Already started server...");
-
+    public static void init(Connection connection, String username) {
         if (INSTANCE != null) return;
 
-        INSTANCE = new GridGameClient(connection);
+        INSTANCE = new GridGameClient(connection, username);
     }
 
     public static GridGameClient getInstance() {
@@ -37,10 +32,10 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
     private final ClientLevel clientLevel;
     private final Player player;
 
-    private GridGameClient(Connection connection) {
+    private GridGameClient(Connection connection, String username) {
         this.connection = connection;
         this.clientLevel = new ClientLevel();
-        this.player = new LocalPlayer(clientLevel);
+        this.player = new LocalPlayer(clientLevel, username);
         RenderableScreen.create();
 
         Events.RENDER_EVENT.addListener(e -> {

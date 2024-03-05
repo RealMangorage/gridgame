@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ClientLevel extends Level {
-    private final ScheduledExecutorService RUNNER = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Client-Level-Thread"));
     private byte[][][] tiles;
     private int sizeX, sizeY, sizeZ;
 
@@ -23,7 +23,7 @@ public class ClientLevel extends Level {
 
 
     public ClientLevel() {
-        RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
+        SERVICE.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
     }
 
     public void setTiles(int x, int y, int z) {
@@ -71,7 +71,7 @@ public class ClientLevel extends Level {
         if (flag == 2) {
             tiles[pos.z()][pos.x()][pos.y()] = Registries.TILE_REGISTRY.getID(tile);
 
-            var TE = tile.createTileEntity(this, pos, LogicalSide.SERVER);
+            var TE = tile.createTileEntity(this, pos, LogicalSide.CLIENT);
             var packedPos = TilePos.pack(pos.x(), pos.y(), pos.z());
             TILE_ENTITYS.remove(packedPos);
             if (TE != null)

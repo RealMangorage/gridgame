@@ -8,46 +8,19 @@ import org.mangorage.gridgame.common.events.RenderEvent;
 import javax.swing.*;
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RenderableScreen extends JPanel {
     public static long lastUpdateMSLength = 0;
     private static final DecimalFormat df = new DecimalFormat("#.##");
     private static final DecimalFormat formatter = new DecimalFormat("#,###");
 
+    private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Render-Thread"));
+
     private RenderableScreen() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        }, 0, Math.abs((int) (((double) 1 / 20) * 1000)));
-    }
-
-    private void renderDebugStats(Graphics graphics) {
-        /*
-        var rate = Game.getInstance().getTickRate();
-        var lastMS = Game.getInstance().getLastMSPerTick();
-        var expectedMS = ((double) 1 / rate) * 1000;
-        var currentTPS = Math.min(rate, 1000.0 / lastMS);
-
-        var lastSave = Game.getInstance().getSaveStartTime();
-        var length = Game.getInstance().getSaveLenghth();
-        var saving = Game.getInstance().isSaving();
-
-        var ticked = Game.getInstance().getGrid().getTickedTE();
-        var player = Game.getInstance().getPlayer();
-
-        graphics.setColor(Color.WHITE);
-        ((Graphics2D) graphics).scale(2, 2);
-        graphics.drawString("Expected %stps (%sms/t)".formatted(rate, expectedMS), 10, 10);
-        graphics.drawString("Current %stps (%sms/t)".formatted(df.format(currentTPS), lastMS), 10, 20);
-        graphics.drawString("Save Status: %s (%s ms)".formatted(saving, saving ? System.currentTimeMillis() - lastSave : length), 10, 30);
-        graphics.drawString("Ticked: %s".formatted(formatter.format(ticked)), 10, 40);
-        graphics.drawString("Player Position x: %s y: %s".formatted(player.getX(), player.getY()), 10, 50);
-         */
+        SERVICE.scheduleAtFixedRate(this::repaint, 0, Math.abs((int) (((double) 1 / 20) * 1000)), TimeUnit.MILLISECONDS);
     }
 
     @Override

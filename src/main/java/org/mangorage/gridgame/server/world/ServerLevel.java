@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ServerLevel extends Level {
-    private final ScheduledExecutorService RUNNER = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Server-Level-Thread"));
     private final byte[][][] tiles;
     private final int sizeX, sizeY, sizeZ;
 
@@ -27,7 +27,7 @@ public class ServerLevel extends Level {
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
 
-        RUNNER.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
+        SERVICE.scheduleAtFixedRate(this::tick, 0, (long)((1D / 20D) * 1000), TimeUnit.MILLISECONDS);
     }
 
     public int getSizeX() {

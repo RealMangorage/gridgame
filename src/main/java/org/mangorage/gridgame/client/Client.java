@@ -17,7 +17,10 @@ import org.mangorage.mangonetwork.core.packet.PacketResponse;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -30,8 +33,8 @@ public class Client {
     }
 
     private final InetSocketAddress server;
-    private final AtomicReference<Channel> channel = new AtomicReference<>();
-
+    private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Client-Packet-Handler"));
+    private final ScheduledExecutorService SERVICE_NETWORK = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Client-Network-Handler"));
 
     public Client(String IP, String username) {
         System.out.println("Starting Client Version 1.0 to IP: %s".formatted(IP));
@@ -40,7 +43,9 @@ public class Client {
         this.server = new InetSocketAddress(ipArr[0], Integer.parseInt(ipArr[1]));
 
         CompletableFuture.runAsync(() -> {
-            EventLoopGroup group = new NioEventLoopGroup();
+            ThreadFactory threadFactory = (r) -> new Thread(r, "Client-Netty");
+            EventLoopGroup group = new NioEventLoopGroup(threadFactory);
+
             try {
                 Bootstrap b = new Bootstrap();
                 b.group(group)
@@ -55,13 +60,13 @@ public class Client {
                                     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
                                         PacketResponse<?> response = PacketHandler.receivePacket(packet, PacketFlow.CLIENTBOUND);
                                         if (response != null) {
-                                            PacketHandler.execute(() -> {
+                                            SERVICE.schedule(() -> {
                                                 PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ctx.channel(), response.packetFlow()));
 
                                                 System.out.printf("Received Packet: %s%n", response.packetName());
                                                 System.out.printf("PacketFlow: %s%n", response.packetFlow());
                                                 System.out.printf("Source: %s%n", response.source());
-                                            });
+                                            }, 10, TimeUnit.MILLISECONDS);
                                         }
                                     }
                                 });
@@ -69,14 +74,13 @@ public class Client {
 
                                 System.out.println("Client Started...");
                             }
-
-
                         });
 
                 var chl = b.connect().sync().channel();
 
                 Connection connection = new Connection(chl, server, PacketFlow.SERVERBOUND);
-                GridGameClient.init(connection);
+
+                GridGameClient.init(connection, username);
 
                 connection.send(new C2SPlayerJoinPacket(username));
                 chl.closeFuture().await();
@@ -85,7 +89,7 @@ public class Client {
             } finally {
                 group.shutdownGracefully();
             }
-        });
+        }, SERVICE_NETWORK);
 
     }
 }

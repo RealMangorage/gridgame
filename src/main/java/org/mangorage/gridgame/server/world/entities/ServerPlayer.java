@@ -1,6 +1,7 @@
 package org.mangorage.gridgame.server.world.entities;
 
 import org.mangorage.gridgame.common.core.Direction;
+import org.mangorage.gridgame.common.packets.clientbound.S2CPlayerMovePacket;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.common.world.entities.Player;
@@ -22,6 +23,8 @@ public final class ServerPlayer extends Player {
         getLevel().setTile(getPos(), TileRegistry.EMPTY_TILE.get(), 2);
         setPos(pos);
         getLevel().setTile(getPos(), TileRegistry.PLAYER_TILE.get(), 2);
+
+        connection.send(new S2CPlayerMovePacket(getPos()));
 
         var TE = getLevel().getTileEntity(getPos());
         if (TE != null && TE instanceof PlayerTileEntity PTE)

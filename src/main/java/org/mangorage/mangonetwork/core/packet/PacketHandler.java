@@ -19,7 +19,6 @@ import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public final class PacketHandler<T extends IPacket> {
-    private final static ScheduledThreadPoolExecutor EXECUTOR = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(4);
     public static final int MAX_PACKET_SIZE = 65536;
 
     private static final Int2ObjectMap<PacketHandler<?>> PACKETS = new Int2ObjectArrayMap<>();
@@ -118,14 +117,6 @@ public final class PacketHandler<T extends IPacket> {
 
     public static <T extends IPacket> PacketHandler<T> get(Class<T> packet) {
         return (PacketHandler<T>) PACKETS_REVERSE.get(packet);
-    }
-
-    public static void execute(Runnable runnable) {
-        EXECUTOR.execute(runnable);
-    }
-
-    public static void schedule(Runnable runnable, int i, TimeUnit timeUnit) {
-        EXECUTOR.schedule(runnable, i, timeUnit);
     }
 
     public interface IHandler<T> {
