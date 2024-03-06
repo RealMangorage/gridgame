@@ -1,6 +1,6 @@
 package org.mangorage.gridgame.client;
 
-import org.mangorage.gridgame.client.screen.RenderableScreen;
+import org.mangorage.gridgame.client.screen.GameScreen;
 import org.mangorage.gridgame.client.world.ClientLevel;
 import org.mangorage.gridgame.client.world.entities.LocalPlayer;
 import org.mangorage.gridgame.common.Events;
@@ -36,7 +36,7 @@ public class GridGameClient implements KeyListener, MouseListener, MouseWheelLis
         this.connection = connection;
         this.clientLevel = new ClientLevel();
         this.player = new LocalPlayer(clientLevel, username);
-        RenderableScreen.create();
+        GameScreen.create();
 
         Events.RENDER_EVENT.addListener(e -> {
             clientLevel.render(e.graphics());

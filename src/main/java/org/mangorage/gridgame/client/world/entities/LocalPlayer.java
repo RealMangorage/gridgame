@@ -21,6 +21,7 @@ public final class LocalPlayer extends Player {
         var TE = getLevel().getTileEntity(pos);
         if (TE instanceof PlayerTileEntity PTE)
             PTE.setUsername(getUsername());
+        setPos(pos);
     }
 
     @Override

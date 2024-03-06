@@ -36,6 +36,6 @@ public final class TileRendererManager {
 
     @FunctionalInterface
     public interface ITileRenderer<T extends Tile, TE extends TileEntity> {
-        void render(Graphics graphics, T tile, TE tileEntity, int x, int y, int offsetX, int offsetY, int width, int height);
+        void render(Graphics2D graphics, T tile, TE tileEntity, int x, int y, int offsetX, int offsetY, int width, int height);
     }
 }

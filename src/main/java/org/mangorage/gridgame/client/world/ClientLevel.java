@@ -86,7 +86,7 @@ public class ClientLevel extends Level {
         TILE_ENTITYS.forEach((k, e) -> e.tick());
     }
 
-    public void render(Graphics graphics) {
+    public void render(Graphics2D graphics) {
         if (tiles != null) {
             for (int z = 0; z < tiles.length; z++) {
                 for (int x = 0; x < tiles[z].length ; x++) {
