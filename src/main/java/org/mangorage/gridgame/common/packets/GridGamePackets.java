@@ -42,6 +42,5 @@ public class GridGamePackets {
     );
 
 
-    public static void init() {
-    }
+    public static void init() {}
 }

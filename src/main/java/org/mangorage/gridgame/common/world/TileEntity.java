@@ -46,22 +46,31 @@ public abstract class TileEntity {
         tick();
     }
 
-    public void tick() {}
+    public void tick() {
+
+    }
 
     public void markDirty() {
         dirty = true;
-    }
-
-    public CompoundTag getUpdateTag() {
-        return new CompoundTag();
     }
 
     public S2CTileEntityUpdatePacket getUpdatePacket() {
         return null;
     }
 
-    public void loadUpdateTag(CompoundTag tag) {}
+    public CompoundTag getUpdateTag() {
+        return save();
+    }
 
-    public void load(CompoundTag tag) {}
-    public CompoundTag save() {return new CompoundTag();}
+    public void loadUpdateTag(CompoundTag tag) {
+        load(tag);
+    }
+
+    public void load(CompoundTag tag) {
+
+    }
+
+    public CompoundTag save() {
+        return new CompoundTag();
+    }
 }

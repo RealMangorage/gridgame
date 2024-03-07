@@ -71,9 +71,11 @@ public class Server {
                                     @Override
                                     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
                                         PacketResponse<?> response = PacketHandler.receivePacket(packet, PacketFlow.SERVERBOUND);
+
                                         if (response != null) {
+                                            var connection = GridGameServer.getInstance().getPipedConnection().getOrCreate(response.source(), ch);
                                             SERVICE.schedule(() -> {
-                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ch, response.packetFlow()));
+                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(connection, ch, response.packetFlow()));
 
                                                 System.out.printf("Received Packet: %s%n", response.packetName());
                                                 System.out.printf("PacketFlow: %s%n", response.packetFlow());

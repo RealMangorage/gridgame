@@ -7,12 +7,12 @@ import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.gridgame.common.world.tileentity.PlayerTileEntity;
 import org.mangorage.gridgame.server.world.ServerLevel;
-import org.mangorage.mangonetwork.core.connection.Connection;
+import org.mangorage.mangonetwork.core.connection.IConnection;
 
 public final class ServerPlayer extends Player {
-    private final Connection connection;
+    private final IConnection connection;
 
-    public ServerPlayer(ServerLevel level, String username, Connection connection) {
+    public ServerPlayer(ServerLevel level, String username, IConnection connection) {
         super(level, username);
         this.connection = connection;
     }
@@ -43,7 +43,7 @@ public final class ServerPlayer extends Player {
     }
 
     @Override
-    public Connection getConnection() {
+    public IConnection getConnection() {
         return connection;
     }
 

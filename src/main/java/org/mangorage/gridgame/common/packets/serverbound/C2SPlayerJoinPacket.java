@@ -26,6 +26,6 @@ public class C2SPlayerJoinPacket implements IPacket {
 
     @Override
     public void handle(Context ctx) {
-        GridGameServer.getInstance().addPlayer(ctx.socketAddress(), ctx.channel(), username);
+        GridGameServer.getInstance().addPlayer(ctx.recipient().getAddress(), ctx.channel(), username);
     }
 }

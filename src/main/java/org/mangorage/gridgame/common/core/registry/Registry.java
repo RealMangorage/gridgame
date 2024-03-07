@@ -15,31 +15,6 @@ public class Registry<T> {
         return new Registry<>(ID);
     }
 
-    private static final class HolderImpl<T, X extends T> implements Holder<X> {
-        private String ID;
-        private final Supplier<X> supplier;
-        private X object;
-
-        private HolderImpl(String ID, Supplier<X> supplier) {
-            this.supplier = supplier;
-        }
-
-        private T register() {
-            object = supplier.get();
-            return object;
-        }
-
-        @Override
-        public X get() {
-            return object;
-        }
-
-        @Override
-        public String getID() {
-            return ID;
-        }
-    }
-
     private final String registryID;
     private final Map<String, Holder<? extends T>> holdersMap = new LinkedHashMap<>();
     private boolean frozen = false;
@@ -63,7 +38,7 @@ public class Registry<T> {
         return holder;
     }
 
-    private void register() {
+    void register() {
         frozen = true;
         holdersMap.forEach((k, holder) -> {
             System.out.println("%s is being registered under ID %s".formatted(k, id));

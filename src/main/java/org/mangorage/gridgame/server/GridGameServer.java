@@ -7,7 +7,9 @@ import org.mangorage.gridgame.common.world.TilePos;
 import org.mangorage.gridgame.common.world.entities.Player;
 import org.mangorage.gridgame.server.world.ServerLevel;
 import org.mangorage.gridgame.server.world.entities.ServerPlayer;
+import org.mangorage.mangonetwork.core.connection.Connection;
 import org.mangorage.mangonetwork.core.connection.IPipedConnection;
+import org.mangorage.mangonetwork.core.packet.PacketFlow;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -37,9 +39,8 @@ public class GridGameServer {
         this.pipedConnection = connection;
     }
 
-
     public void addPlayer(InetSocketAddress address, Channel channel, String username) {
-        var connection = pipedConnection.join(address, channel);
+        var connection = pipedConnection.getOrCreate(address, channel);
         if (connection != null) {
             PLAYERS.put(address, new ServerPlayer(serverLevel, username, connection));
             pipedConnection.send(new S2CWorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()), address);

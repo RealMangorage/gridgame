@@ -3,7 +3,7 @@ package org.mangorage.gridgame.common.world.entities;
 import org.mangorage.gridgame.common.core.Direction;
 import org.mangorage.gridgame.common.world.Level;
 import org.mangorage.gridgame.common.world.TilePos;
-import org.mangorage.mangonetwork.core.connection.Connection;
+import org.mangorage.mangonetwork.core.connection.IConnection;
 
 public abstract class Player {
     private final Level level;
@@ -18,7 +18,7 @@ public abstract class Player {
 
     abstract public void moveTo(TilePos pos);
     abstract public void move(Direction direction);
-    abstract public Connection getConnection();
+    abstract public IConnection getConnection();
 
     public void setPos(TilePos pos) {
         this.pos = pos;

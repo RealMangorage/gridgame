@@ -35,6 +35,7 @@ public class Client {
     private final InetSocketAddress server;
     private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Client-Packet-Handler"));
     private final ScheduledExecutorService SERVICE_NETWORK = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Client-Network-Handler"));
+    private Connection connection;
 
     public Client(String IP, String username) {
         System.out.println("Starting Client Version 1.0 to IP: %s".formatted(IP));
@@ -59,9 +60,10 @@ public class Client {
                                     @Override
                                     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception {
                                         PacketResponse<?> response = PacketHandler.receivePacket(packet, PacketFlow.CLIENTBOUND);
+
                                         if (response != null) {
                                             SERVICE.schedule(() -> {
-                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(response.source(), ctx.channel(), response.packetFlow()));
+                                                PacketHandler.handle(response.packet(), response.packetId(), new Context(connection, ctx.channel(), response.packetFlow()));
 
                                                 System.out.printf("Received Packet: %s%n", response.packetName());
                                                 System.out.printf("PacketFlow: %s%n", response.packetFlow());
@@ -78,7 +80,7 @@ public class Client {
 
                 var chl = b.connect().sync().channel();
 
-                Connection connection = new Connection(chl, server, PacketFlow.SERVERBOUND);
+                this.connection = new Connection(chl, server, PacketFlow.SERVERBOUND);
 
                 GridGameClient.init(connection, username);
 

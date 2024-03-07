@@ -10,14 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // Server Sided Connection
 public final class PipedConnection implements IPipedConnection {
-    private static final IConnection EMPTY_CONNECTION = new IConnection() {
-        @Override
-        public <T extends IPacket> void send(T packet) {
-            System.out.println("Attemped to send packet. Unable to send. Empty Connection. Error");
-        }
-    };
-
-    private final Map<InetSocketAddress, IConnection> connections = new ConcurrentHashMap<>();
+    private final Map<InetSocketAddress, IConnection> CONNECTIONS = new ConcurrentHashMap<>();
 
     public PipedConnection() {
 
@@ -25,19 +18,16 @@ public final class PipedConnection implements IPipedConnection {
 
     @Override
     public <T extends IPacket> void send(T packet, InetSocketAddress sendTo) {
-        connections.forEach((k, v) -> v.send(packet));
+        CONNECTIONS.forEach((k, v) -> v.send(packet));
     }
 
     @Override
     public <T extends IPacket> void send(T packet) {
-        connections.forEach((k, v) -> v.send(packet));
+        CONNECTIONS.forEach((k, v) -> v.send(packet));
     }
 
     @Override
-    public Connection join(InetSocketAddress address, Channel channel) {
-        if (connections.containsKey(address)) return null;
-        var connection = new Connection(channel, address, PacketFlow.CLIENTBOUND);
-        connections.put(address, connection);
-        return connection;
+    public IConnection getOrCreate(InetSocketAddress address, Channel channel) {
+        return CONNECTIONS.computeIfAbsent(address, a -> new Connection(channel, a, PacketFlow.CLIENTBOUND));
     }
 }

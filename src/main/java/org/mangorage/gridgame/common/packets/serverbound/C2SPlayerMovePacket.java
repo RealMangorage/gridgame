@@ -1,7 +1,6 @@
 package org.mangorage.gridgame.common.packets.serverbound;
 
 import org.mangorage.gridgame.common.core.Direction;
-import org.mangorage.gridgame.server.GridGameServer;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 import org.mangorage.mangonetwork.core.packet.Context;
 import org.mangorage.mangonetwork.core.packet.IPacket;
@@ -25,8 +24,8 @@ public class C2SPlayerMovePacket implements IPacket {
     }
 
     // side -> The side that sent the packet, so if we get packets from Server, we are on client
-    // if we get packets from client, we are on server...
+    // if we get packets from a client, we are on server...
     public void handle(Context ctx) {
-        GridGameServer.getInstance().getPlayer(ctx.socketAddress()).move(direction);
+        ctx.getPlayer().move(direction);
     }
 }
