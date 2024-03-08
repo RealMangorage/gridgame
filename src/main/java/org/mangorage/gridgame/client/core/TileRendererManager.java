@@ -1,5 +1,6 @@
 package org.mangorage.gridgame.client.core;
 
+import org.mangorage.gridgame.common.Registries;
 import org.mangorage.gridgame.common.core.registry.Holder;
 import org.mangorage.gridgame.common.world.Tile;
 import org.mangorage.gridgame.common.world.TileEntity;
@@ -10,6 +11,13 @@ import java.util.Map;
 
 public final class TileRendererManager {
     private static final TileRendererManager renderManager = new TileRendererManager();
+    private static final ITileRenderer<Tile, TileEntity> DEFAULT_RENDERER = (g, t, te, x, y, oX, oY, w, h) -> {
+        var img = CacheAPI.getInternalImage("/assets/tiles/%s.png".formatted(Registries.TILE_REGISTRY.getHolderByObject(t).getID()));
+        System.out.println(Registries.TILE_REGISTRY.getHolderByObject(t).getID());
+        if (img == null) return;
+        g.drawImage(img, x * w, y * h, w, h, null);
+    };
+
     private final Map<Tile, ITileRenderer<? extends Tile, ? extends TileEntity>> renderers = new HashMap<>();
 
     public static TileRendererManager getInstance() {
@@ -31,7 +39,12 @@ public final class TileRendererManager {
 
     @SuppressWarnings("unchecked")
     public ITileRenderer<Tile, TileEntity> getRenderer(Tile tile) {
-        return (ITileRenderer<Tile, TileEntity>) renderers.get(tile);
+        if (tile.hasRenderer()) {
+            var renderer = (ITileRenderer<Tile, TileEntity>) renderers.get(tile);
+            return renderer != null ? renderer : DEFAULT_RENDERER;
+        } else {
+            return null;
+        }
     }
 
     @FunctionalInterface

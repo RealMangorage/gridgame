@@ -44,7 +44,7 @@ public class GridGameServer {
         if (connection != null) {
             PLAYERS.put(address, new ServerPlayer(serverLevel, username, connection));
             pipedConnection.send(new S2CWorldLoadPacket(serverLevel.getSizeX(), serverLevel.getSizeY(), serverLevel.getSizeZ()), address);
-            serverLevel.setTile(new TilePos(0, 0, 0), TileRegistry.SOLD_TILE.get(), 2);
+            serverLevel.setTile(new TilePos(0, 0, 0), TileRegistry.COBBLESTONE_TILE.get(), 2);
         }
     }
 

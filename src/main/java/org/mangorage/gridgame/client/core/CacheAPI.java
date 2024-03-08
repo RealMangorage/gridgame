@@ -54,8 +54,10 @@ public class CacheAPI {
     }
 
     public static Image getInternalImage(String path) {
-        if (IMAGE_CACHE.containsKey(path)) return IMAGE_CACHE.get(path);
+        if (IMAGE_CACHE.containsKey(path))
+            return IMAGE_CACHE.get(path);
         var data = getResourceBytesFromWithin(path);
+        if (data == null) return null;
         Image image = byteArrayToImage(data);
         IMAGE_CACHE.put(path, image);
         return image;

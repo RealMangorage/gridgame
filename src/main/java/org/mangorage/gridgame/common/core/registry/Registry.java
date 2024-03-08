@@ -1,6 +1,7 @@
 package org.mangorage.gridgame.common.core.registry;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
@@ -17,6 +18,7 @@ public class Registry<T> {
 
     private final String registryID;
     private final Map<String, Holder<? extends T>> holdersMap = new LinkedHashMap<>();
+    private final Byte2ObjectMap<Holder<? extends T>> holdersMap_Backed = new Byte2ObjectLinkedOpenHashMap<>();
     private boolean frozen = false;
 
     private final Byte2ObjectMap<T> registryMap = new Byte2ObjectArrayMap<>();
@@ -45,12 +47,17 @@ public class Registry<T> {
             var object = ((HolderImpl<T, ? extends T>) holder).register();
             registryMap.put(id, object);
             registry_reversed.put(object, id);
+            holdersMap_Backed.put(id, holder);
             id = (byte) (id + 1);
         });
     }
 
     public byte getID(T object) {
         return registry_reversed.getByte(object);
+    }
+
+    public Holder<? extends T> getHolderByObject(T object) {
+        return holdersMap_Backed.get(getID(object));
     }
 
     public T getObject(byte ID) {

@@ -6,4 +6,7 @@ public class Tile {
     public TileEntity createTileEntity(Level level, TilePos tilePos, LogicalSide logicalSide) {
         return null;
     }
+    public boolean hasRenderer() {
+        return true;
+    }
 }

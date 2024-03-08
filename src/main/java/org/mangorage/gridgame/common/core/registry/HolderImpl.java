@@ -1,13 +1,15 @@
 package org.mangorage.gridgame.common.core.registry;
 
+
 import java.util.function.Supplier;
 
 final class HolderImpl<T, X extends T> implements Holder<X> {
-    private String ID;
+    private final String ID;
     private final Supplier<X> supplier;
     private X object;
 
     HolderImpl(String ID, Supplier<X> supplier) {
+        this.ID = ID;
         this.supplier = supplier;
     }
 
