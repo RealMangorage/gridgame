@@ -33,6 +33,7 @@ public class S2CTileEntityUpdatePacket implements IPacket {
 
     @Override
     public void handle(Context ctx) {
+        System.out.println(tag);
         var TE = GridGameClient.getInstance().getLevel().getTileEntity(tilePos);
         if (TE != null)
             TE.loadUpdateTag(tag);

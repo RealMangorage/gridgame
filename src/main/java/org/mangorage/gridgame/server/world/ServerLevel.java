@@ -1,6 +1,7 @@
 package org.mangorage.gridgame.server.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import org.jetbrains.annotations.Nullable;
 import org.mangorage.gridgame.common.Registries;
 import org.mangorage.gridgame.common.packets.clientbound.S2CTileUpdatePacket;
 import org.mangorage.gridgame.common.world.Level;
@@ -52,7 +53,7 @@ public class ServerLevel extends Level {
     @Override
     public void setTile(TilePos pos, Tile tile, int flag) {
         var id = Registries.TILE_REGISTRY.getID(tile);
-        this.tiles[pos.z()][pos.x()][pos.z()] = id;
+        this.tiles[pos.z()][pos.x()][pos.y()] = id;
 
         var TE = tile.createTileEntity(this, pos, LogicalSide.SERVER);
         var packedPos = TilePos.pack(pos.x(), pos.y(), pos.z());
@@ -69,7 +70,7 @@ public class ServerLevel extends Level {
     }
 
     @Override
-    public TileEntity getTileEntity(TilePos pos) {
+    public @Nullable TileEntity getTileEntity(TilePos pos) {
         return TILE_ENTITYS.get(TilePos.pack(pos));
     }
 

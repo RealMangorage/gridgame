@@ -79,8 +79,6 @@ public class ClientLevel extends Level {
         }
     }
 
-
-
     @Override
     protected void tick() {
         TILE_ENTITYS.forEach((k, e) -> e.tick());

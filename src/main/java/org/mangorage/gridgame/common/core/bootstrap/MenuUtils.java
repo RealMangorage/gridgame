@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class MenuUtils {
 
-    public static MenuOption showInputDialog(String title) {
+    public static MenuResult showInputDialog(String title) {
         // Create a text field
         JTextField USERNAME = new JTextField(10);
         USERNAME.setText("Username");
@@ -23,7 +23,7 @@ public class MenuUtils {
 
         // Check if OK button is clicked
         if (result == JOptionPane.OK_OPTION) {
-            return new MenuOption(IP.getText(), USERNAME.getText());
+            return new MenuResult(IP.getText(), USERNAME.getText());
         } else {
             return null;
         }

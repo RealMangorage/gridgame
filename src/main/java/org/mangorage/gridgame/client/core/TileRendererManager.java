@@ -13,7 +13,6 @@ public final class TileRendererManager {
     private static final TileRendererManager renderManager = new TileRendererManager();
     private static final ITileRenderer<Tile, TileEntity> DEFAULT_RENDERER = (g, t, te, x, y, oX, oY, w, h) -> {
         var img = CacheAPI.getInternalImage("/assets/tiles/%s.png".formatted(Registries.TILE_REGISTRY.getHolderByObject(t).getID()));
-        System.out.println(Registries.TILE_REGISTRY.getHolderByObject(t).getID());
         if (img == null) return;
         g.drawImage(img, x * w, y * h, w, h, null);
     };
