@@ -7,6 +7,11 @@ import org.mangorage.gridgame.common.world.tileentity.PlayerTileEntity;
 import org.mangorage.gridgame.common.world.tileentity.SolidWallTileEntity;
 
 import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Renderers {
     private static final TileRendererManager MANAGER = TileRendererManager.getInstance();
@@ -18,9 +23,9 @@ public class Renderers {
                 (graphics, tile, entity, x, y, oX, oY, w, h) -> {
                     graphics.setColor(Color.ORANGE);
                     if (entity.isUseCobble()) {
-                        graphics.drawImage(CacheAPI.getInternalImage("/assets/cobblestone.png"), x * w, y * h, w, h, null);
+                        graphics.drawImage(CacheAPI.getInternalImage("assets/cobblestone.png"), x * w, y * h, w, h, null);
                     } else {
-                        graphics.drawImage(CacheAPI.getInternalImage("/assets/stone.png"), x * w, y * h, w, h, null);
+                        graphics.drawImage(CacheAPI.getInternalImage("assets/stone.png"), x * w, y * h, w, h, null);
                     }
                 }
         );

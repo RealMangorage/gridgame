@@ -5,7 +5,6 @@ import org.mangorage.gridgame.common.Events;
 import org.mangorage.gridgame.common.events.RenderEvent;
 
 import javax.swing.*;
-import javax.swing.plaf.PanelUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
@@ -58,6 +57,7 @@ public class GameScreen extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Grid Game! By MangoRage");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
             GameScreen gameScreen = new GameScreen();
             frame.add(gameScreen);
             frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);

@@ -54,6 +54,10 @@ public class CacheAPI {
     }
 
     public static Image getInternalImage(String path) {
+        // Fixes it so it starts with /
+        if (!path.startsWith("/"))
+            path = "/" + path;
+
         if (IMAGE_CACHE.containsKey(path))
             return IMAGE_CACHE.get(path);
         var data = getResourceBytesFromWithin(path);

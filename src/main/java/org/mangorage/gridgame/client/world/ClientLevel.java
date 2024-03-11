@@ -96,7 +96,7 @@ public class ClientLevel extends Level {
 
                         if (renderer != null) {
                             var TE = TILE_ENTITYS.get(TilePos.pack(x, y, z));
-                            renderer.render(graphics, tile, TE, x, y, 0, 0, 16, 16);
+                            renderer.render(graphics, tile, TE, x, y, 0, 0, 32, 32);
                         }
                     }
                 }
