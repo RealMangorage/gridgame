@@ -56,7 +56,7 @@ task runGame(type: JavaExec) {
 
     setWorkingDir("build/run/integrated")
     setGroup("runs")
-    setArgsString("-i")
+    setArgsString("-i -d")
 
     doFirst {
         File runDir = file("build/run/integrated")

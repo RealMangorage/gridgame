@@ -4,8 +4,8 @@ import io.netty.channel.Channel;
 import org.mangorage.mangonetwork.core.packet.IPacket;
 import org.mangorage.mangonetwork.core.packet.PacketFlow;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
-
 import java.net.InetSocketAddress;
+
 public final class Connection implements IConnection {
     private final InetSocketAddress address;
     private final Channel channel;
@@ -24,7 +24,7 @@ public final class Connection implements IConnection {
     @SuppressWarnings("all")
     @Override
     public <T extends IPacket> void send(T packet) {
-        PacketHandler<IPacket> iPacket = (PacketHandler<IPacket>) PacketHandler.get(packet.getClass());
+        var iPacket = PacketHandler.cast(PacketHandler.get(packet.getClass()));
         iPacket.send(
                 packet,
                 packetFlow,

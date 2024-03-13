@@ -14,6 +14,7 @@ import org.mangorage.gridgame.common.events.RegisterRenderersEvent;
 import org.mangorage.gridgame.common.packets.GridGamePackets;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.server.Server;
+import org.mangorage.mangonetwork.core.DebugState;
 
 public class Bootstrap {
     private static boolean loaded = false;
@@ -32,13 +33,23 @@ public class Bootstrap {
         // Add options
         Option serverOption = new Option("s", "server", false, "Use Server");
         Option useIntegrated = new Option("i", "integrated", false, "Use Integrated");
+        Option debugEnabled = new Option("d", "debug", false, "Enable Debug Messages");
 
 
         options.addOption(serverOption);
         options.addOption(useIntegrated);
+        options.addOption(debugEnabled);
 
         CommandLineParser parser = new DefaultParser();
         var result = parser.parse(options, args);
+
+        var debug = result.hasOption(debugEnabled.getOpt());
+
+        if (debug) {
+            DebugState.PRINT_RECEIVE.enable();
+            DebugState.PRINT_SENT.enable();
+            DebugState.PRINT_RESPONSE.enable();
+        }
 
         GridGamePackets.init();
         TileRegistry.init();
