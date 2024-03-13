@@ -21,12 +21,11 @@ public class GameScreen extends JPanel {
     private static final int WINDOW_HEIGHT = 720;
 
     private final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor((r) -> new Thread(r, "Render-Thread"));
-
-    private final BufferedImage image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
-    private final Graphics2D g = image.createGraphics();
+    private BufferedImage IMAGE;
+    private Graphics2D graphics2D;
 
     private GameScreen() {
-        SERVICE.scheduleAtFixedRate(this::repaint, 0, Math.abs((int) (((double) 1 / 20) * 1000)), TimeUnit.MILLISECONDS);
+        SERVICE.scheduleAtFixedRate(this::repaint, 0,  (long) (((double) 1/60) * 1000), TimeUnit.MILLISECONDS);
     }
 
     public void paintExtra(Graphics graphics) {
@@ -38,19 +37,23 @@ public class GameScreen extends JPanel {
         }
     }
 
+
+
     @Override
     protected void paintComponent(Graphics graphics) {
+        if (IMAGE == null) {
+            this.IMAGE = getGraphicsConfiguration().createCompatibleImage(WINDOW_WIDTH, WINDOW_HEIGHT);
+            this.graphics2D = IMAGE.createGraphics();
+        }
+
         long start = System.currentTimeMillis();
-        super.paintComponent(graphics);
 
-        image.getGraphics().clearRect(0, 0, getWidth(), getHeight());
-        setBackground(Color.BLACK);
+        graphics2D.clearRect(0, 0, getWidth(), getHeight());
+        Events.RENDER_EVENT.trigger(new RenderEvent(graphics2D));
+        paintExtra(graphics2D);
+        graphics.drawImage(IMAGE, 0, 0, null);
 
-        //paintExtra(g);
-        Events.RENDER_EVENT.trigger(new RenderEvent(g));
-        graphics.drawImage(image, 0, 0, null);
-
-        lastUpdateMSLength = System.currentTimeMillis() - start;
+        lastUpdateMSLength = (System.currentTimeMillis() - start);
     }
 
     public static void create() {
@@ -59,6 +62,7 @@ public class GameScreen extends JPanel {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             GameScreen gameScreen = new GameScreen();
+            gameScreen.setBackground(Color.BLACK);
             frame.add(gameScreen);
             frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
             frame.setVisible(true);

@@ -9,7 +9,7 @@ import org.mangorage.gridgame.common.packets.clientbound.S2CWorldLoadPacket;
 import org.mangorage.mangonetwork.core.packet.PacketHandler;
 
 public class GridGamePackets {
-    public static int ID = 1000;
+    public static int ID = 0;
 
     public static final PacketHandler<C2SPlayerJoinPacket> PLAYER_JOIN_PACKET = PacketHandler.create(
             C2SPlayerJoinPacket.class,

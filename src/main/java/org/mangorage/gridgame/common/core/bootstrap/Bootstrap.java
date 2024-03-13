@@ -11,9 +11,9 @@ import org.mangorage.gridgame.common.Events;
 import org.mangorage.gridgame.common.events.LoadEvent;
 import org.mangorage.gridgame.common.events.RegisterEvent;
 import org.mangorage.gridgame.common.events.RegisterRenderersEvent;
+import org.mangorage.gridgame.common.packets.GridGamePackets;
 import org.mangorage.gridgame.common.registry.TileRegistry;
 import org.mangorage.gridgame.server.Server;
-import org.mangorage.mangonetwork.Packets;
 
 public class Bootstrap {
     private static boolean loaded = false;
@@ -40,7 +40,7 @@ public class Bootstrap {
         CommandLineParser parser = new DefaultParser();
         var result = parser.parse(options, args);
 
-        Packets.init();
+        GridGamePackets.init();
         TileRegistry.init();
 
         Events.LOAD_EVENT.trigger(new LoadEvent());

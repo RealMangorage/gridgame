@@ -5,15 +5,12 @@ import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import org.mangorage.mangonetwork.core.LogicalSide;
+import org.mangorage.mangonetwork.core.DebugState;
 import org.mangorage.mangonetwork.core.SimpleByteBuf;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -24,23 +21,52 @@ public final class PacketHandler<T extends IPacket> {
     private static final Int2ObjectMap<PacketHandler<?>> PACKETS = new Int2ObjectArrayMap<>();
     private static final Map<Class<?>, PacketHandler<?>> PACKETS_REVERSE = new HashMap<>();
 
+    public static void printDebug(PacketResponse<?> response) {
+        if (!DebugState.PRINT_RESPONSE.isEnabled()) return;
+        System.out.println("----------------------------------------------------");
+        System.out.println("Packet Response Info:");
+        System.out.printf("Received Packet: %s%n", response.packetName());
+        System.out.printf("PacketFlow: %s%n", response.packetFlow());
+        System.out.printf("Source: %s%n", response.source());
+        System.out.println("----------------------------------------------------");
+    }
+
+    private static <T extends IPacket> void printDebugSent(T packet, PacketFlow packetFlow, DatagramPacket datagramPacket) {
+        if (!DebugState.PRINT_SENT.isEnabled()) return;
+        System.out.println("----------------------------------------------------");
+        System.out.println("Packet Send Info:");
+        System.out.println("Sent Packet %s to %s with size of %s bytes".formatted(packet.getClass().getName(), packetFlow, datagramPacket.content().readableBytes()));
+        System.out.println("----------------------------------------------------");
+    }
+
+    private static <T extends IPacket> void printDebugReceive(int packetID, DatagramPacket datagramPacket, int totalSize) {
+        if (!DebugState.PRINT_RECEIVE.isEnabled()) return;
+        System.out.println("----------------------------------------------------");
+        System.out.println("Packet Receive Info:");
+        System.out.println("Packet ID %s from %s received with size: %s bytes".formatted(packetID, datagramPacket.sender(), totalSize));
+        System.out.println("----------------------------------------------------");
+    }
+
 
     public static PacketResponse<?> receivePacket(DatagramPacket datagramPacket, PacketFlow packetFlow) {
         SimpleByteBuf headerBuffer = new SimpleByteBuf(datagramPacket.content());
         int totalSize = headerBuffer.readableBytes();
         int packetId = headerBuffer.readInt();
-        LogicalSide from = headerBuffer.readEnum(LogicalSide.class);
 
-        System.out.println("%s %s".formatted(packetId, from));
         SimpleByteBuf packetBuffer = new SimpleByteBuf(Unpooled.wrappedBuffer(headerBuffer.readByteArray()));
 
-        if (packetId < 0 || from == null || !PACKETS.containsKey(packetId)) {
+        if (packetId < 0 || !PACKETS.containsKey(packetId)) {
             System.out.println("Received Bad Packet (Packet ID/Type: %s %s) from %s....".formatted(packetId, PACKETS.containsKey(packetId) ? PACKETS.get(packetId).getNameID() : "Unknown", datagramPacket.sender()));
             return null;
         }
 
         var handler = PACKETS.get(packetId);
-        System.out.println("Packet ID %s from %s received with size: %s bytes".formatted(packetId, datagramPacket.sender(), totalSize));
+        if (handler.packetFlow != packetFlow) {
+            System.out.println("Cannot Receive Packet %s due to it being recieved on wrong end, Recieved on %s instead of %s".formatted(handler.getClazz().getName(), packetFlow, handler.packetFlow));
+            return null;
+        }
+
+        printDebugReceive(packetId, datagramPacket, totalSize);
 
         try {
             return new PacketResponse<>(
@@ -154,7 +180,6 @@ public final class PacketHandler<T extends IPacket> {
         encoder.accept(packet, packetBuffer);
 
         headerBuffer.writeInt(ID); // ID
-        headerBuffer.writeEnum(packetFlow); // Side
         headerBuffer.writeByteArray(packetBuffer.array());
 
         byte[] data = headerBuffer.array();
@@ -166,11 +191,12 @@ public final class PacketHandler<T extends IPacket> {
         try {
             DatagramPacket datagramPacket = new DatagramPacket(headerBuffer, recipient);
             channel.writeAndFlush(datagramPacket).sync();
-            System.out.println("Sent Packet %s to %s with size of %s bytes".formatted(packet.getClass().getName(), packetFlow, datagramPacket.content().readableBytes()));
+            printDebugSent(packet, packetFlow, datagramPacket);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     public Function<SimpleByteBuf, T> getDecoder() {
         return decoder;

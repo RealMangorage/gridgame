@@ -64,10 +64,7 @@ public class Client {
                                         if (response != null) {
                                             SERVICE.schedule(() -> {
                                                 PacketHandler.handle(response.packet(), response.packetId(), new Context(connection, ctx.channel(), response.packetFlow()));
-
-                                                System.out.printf("Received Packet: %s%n", response.packetName());
-                                                System.out.printf("PacketFlow: %s%n", response.packetFlow());
-                                                System.out.printf("Source: %s%n", response.source());
+                                                PacketHandler.printDebug(response);
                                             }, 10, TimeUnit.MILLISECONDS);
                                         }
                                     }

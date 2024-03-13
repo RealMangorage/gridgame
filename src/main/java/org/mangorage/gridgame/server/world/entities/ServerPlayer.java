@@ -24,12 +24,6 @@ public final class ServerPlayer extends Player {
         if (!getLevel().isValid(pos)) return;
         if (System.currentTimeMillis() - lastMove < 50) return;
 
-        System.out.println(getPos());
-        System.out.println(pos);
-
-        System.out.println(getLevel().getTile(getPos()));
-        System.out.println(getLevel().getTile(pos));
-
         if (getLevel().getTile(pos) instanceof EmptyTile) {
             getLevel().setTile(getPos(), TileRegistry.EMPTY_TILE.get(), 2);
             setPos(pos);

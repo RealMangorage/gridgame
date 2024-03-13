@@ -26,6 +26,7 @@ public class C2SPlayerMovePacket implements IPacket {
     // side -> The side that sent the packet, so if we get packets from Server, we are on client
     // if we get packets from a client, we are on server...
     public void handle(Context ctx) {
-        ctx.getPlayer().move(direction);
+        if (ctx.getPlayer() != null)
+            ctx.getPlayer().move(direction);
     }
 }
